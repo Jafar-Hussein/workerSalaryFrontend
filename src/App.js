@@ -6,19 +6,19 @@ import UserDash from './components/UserDash';
 
 function App() {
   return (
-    // <Router>
-    //   <div className="App">
-    //   <Routes>
-    //    <Route path="/" element={<Login />} />
-    //    <Route path="/admin-dashboard" element={<AdminDash />} />
-    //    <Route path="/user-dashboard" element={<UserDash />} />
-    //  </Routes>
-    //   </div>
-    // </Router>
-    <div className='App'>
-      <AdminDash />
-
-    </div>
+     <Router>
+       <div className="App">
+      <Routes>
+       <Route path="/" element={<Login />} />
+        <Route path="/admin-dashboard" element={<AdminDash />} />
+        <Route path="/user-dashboard" element={<UserDash />} />
+      </Routes>
+       </div>
+     </Router>
+    // <div className='App'>
+      
+    // <UserDash />
+    // </div>
   );
 }
 
