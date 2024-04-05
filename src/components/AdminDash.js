@@ -11,9 +11,37 @@ import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/AdminDash.css';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
 
 
 function AdminDash() {
+  const navigate = useNavigate();
+
+  const handleButtonClick = (buttonId) => {
+    switch(buttonId) {
+      case 'create-account':
+        navigate('/admin/account');
+        break;
+      case 'add-info':
+        navigate('/admin/add-employee');
+        break;
+      case 'create-salary':
+        navigate('/admin/salary');
+        break;
+      case 'update-employee':
+        navigate('/admin/update-employee');
+        break;
+      case 'review-leave':
+        navigate('/admin/review-leave');
+        break;
+      case 'delete-employee':
+        navigate('/admin/delete-employee');
+        break;
+      default:
+        console.error('Invalid button ID');
+        break;
+    }
+  };
   return (
     <Container fluid="md" id='con'>
       <header className='header-title'>
@@ -25,7 +53,7 @@ function AdminDash() {
             <h2 className='title'>Create account</h2>
             <img src={UserImage} alt="user icon" roundedCircle  className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Create</Button>{' '}
+            <Button variant="primary" className='btn'  onClick={() => handleButtonClick('create-account')}>Create</Button>{' '}
             </>
         </div>
         </Col>
@@ -34,7 +62,7 @@ function AdminDash() {
             <h2 className='title'>Add employee info</h2>
             <img src= {EmployeeImage} alt="employee icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Add</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => handleButtonClick('add-info')}>Add</Button>{' '}
             </>
         </div>
         </Col>
@@ -43,7 +71,7 @@ function AdminDash() {
             <h2 className='title'>create salary</h2>
             <img src= {SalaryImage} alt="salary icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Create</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => handleButtonClick('create-salary')}>Create</Button>{' '}
             </>
         </div>
         </Col>
@@ -54,7 +82,7 @@ function AdminDash() {
             <h2 className='title'>Update employee</h2>
             <img src= {UpdateEmployee} alt="update icon" className='icon-image' />
             <>
-            <Button variant="primary">Create</Button>{' '}
+            <Button variant="primary" onClick={() => handleButtonClick('update-employee')}>Create</Button>{' '}
             </>
             </div>
         </Col>
@@ -63,16 +91,16 @@ function AdminDash() {
             <h2 className='title'>Review leave</h2>
             <img src= {LeaveRequest} alt="leave icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Review</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => handleButtonClick('review-leave')}>Review</Button>{' '}
             </>
             </div>
         </Col>
         <Col >
-          <div className='Delete employee'>
+          <div className='Delete-employee'>
             <h2 className='title'>Delete employee</h2>
             <img src= {DeleteEmployee} alt="delete icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Delete</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => handleButtonClick('Delete-employee')}>Delete</Button>{' '}
             </>
             </div>
         </Col>
