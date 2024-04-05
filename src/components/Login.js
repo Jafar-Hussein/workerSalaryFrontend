@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import {useHistory} from 'react-router-dom';
-import jwt_decode from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import '../css/login.css';
-// const url = 'http://localhost:5000/auth/login';
 
 function Login() {
     const url = 'http://localhost:5000/auth/login';
@@ -10,7 +9,7 @@ function Login() {
       username: '',
       password: ''
     });
-    const history = useHistory();
+    const navigate = useNavigate();
   
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -25,24 +24,32 @@ function Login() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(credentials)
         });
+    
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const { jwtToken } = await response.json();
+    
+        const json = await response.json();
+        const jwtToken = json.message; // Get the JWT token from the 'message' key
+    
+        if (typeof jwtToken !== 'string') {
+          throw new Error('JWT Token is not a string.');
+        }
+    
         localStorage.setItem('token', jwtToken); // Save the JWT token in localStorage
-  
-        const decoded = jwt_decode(jwtToken); // Decode the JWT to get user's role
-        if(decoded.role === 'ADMIN') {
-          history.push('/admin-dashboard'); // Redirect to the admin dashboard
-        } else if(decoded.role === 'USER') {
-          history.push('/user-dashboard'); // Redirect to the user dashboard
+    
+        const decoded = jwtDecode(jwtToken); // Decode the JWT to get user's role
+    
+        // Assuming the roles are an array, check if the role includes 'ADMIN' or 'USER'
+        if (decoded.roles.includes('ADMIN')) {
+          navigate('/admin-dashboard'); // Correct usage of navigate
+        } else if (decoded.roles.includes('USER')) {
+          navigate('/user-dashboard'); // Correct usage of navigate
         }
       } catch (error) {
         console.error('Login error', error);
       }
     };
-  
     return (
       <div className='login-container'>
         <div className='content-container'>
@@ -74,5 +81,6 @@ function Login() {
         </div>
       </div>
     );
-  }
+}
+
 export default Login;

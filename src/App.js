@@ -1,16 +1,23 @@
-// import logo from './logo.svg';
-// import './App.css';
-import Login from './login/Login';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './components/Login';
+import AdminDash from './components/AdminDash';
+import UserDash from './components/UserDash';
 
 function App() {
   return (
-    <div className="App">
+    // <Router>
+    //   <div className="App">
+    //   <Routes>
+    //    <Route path="/" element={<Login />} />
+    //    <Route path="/admin-dashboard" element={<AdminDash />} />
+    //    <Route path="/user-dashboard" element={<UserDash />} />
+    //  </Routes>
+    //   </div>
+    // </Router>
+    <div className='App'>
+      <AdminDash />
 
-      <header className="App-header">
-        {
-          <Login />
-        }
-      </header>
     </div>
   );
 }
