@@ -1,0 +1,20 @@
+.detail-box, .input-box {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Simple box shadow */
+    margin-bottom: 20px; /* Adds spacing between boxes */
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+.detail-box ul li {
+    list-style-type: none; /* Removes the bullet points */
+    padding: 5px 0; /* Adds some padding above and below each list item */
+    text-align: left;
+}
+
+.detail-box ul {
+    padding-left: 0; /* Removes padding from the list */
+}

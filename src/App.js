@@ -38,5 +38,11 @@ import Leave from './components/admin/Leave'
 //   );
 // }
 
-
+// function App() {
+//   return (
+//     <div className='App'>
+//      <AddEmp />
+//     </div>
+//   );
+// }
 export default App;

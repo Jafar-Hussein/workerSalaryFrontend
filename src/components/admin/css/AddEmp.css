@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #CACACA;
+    font-family: 'Montserrat', sans-serif;
+}
+h1{
+    font-size: 50px;
+    margin-top: 20px;
+    font-weight: 700;
+
+}
+.container {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 50px; /* Adjust as needed for spacing from the top */
+}
+
+#form-info {
+    width: 100%; /* This will take the full width of the container */
+}
+
+.form-label {
+    font-weight: 600; /* Make labels bold */
+}
+
+.form-control {
+    margin-bottom: 15px; /* Adds space below each input */
+}
+
+/* If you need to adjust the width of the input for smaller screens */
+@media (max-width: 768px) {
+    .form-control {
+        width: 100%;
+    }
+}
