@@ -82,7 +82,7 @@ function AdminDash() {
             <h2 className='title'>Update employee</h2>
             <img src= {UpdateEmployee} alt="update icon" className='icon-image' />
             <>
-            <Button variant="primary" onClick={() => handleButtonClick('update-employee')}>Create</Button>{' '}
+            <Button variant="primary" onClick={() => handleButtonClick('update-employee')}>Update</Button>{' '}
             </>
             </div>
         </Col>
@@ -100,7 +100,7 @@ function AdminDash() {
             <h2 className='title'>Delete employee</h2>
             <img src= {DeleteEmployee} alt="delete icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn' onClick={() => handleButtonClick('Delete-employee')}>Delete</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => handleButtonClick('delete-employee')}>Delete</Button>{' '}
             </>
             </div>
         </Col>

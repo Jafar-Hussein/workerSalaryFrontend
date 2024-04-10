@@ -162,7 +162,7 @@ function Account() {
                         </Form.Group>
                     </Col>
                 </Row>
-                <Button variant="secondary" onClick={() => navigate('/admin-dashboard')}>
+                <Button variant="primary" id='back' onClick={() => handleButtonClick('back')}>
                     Back
                 </Button>
                 <Button variant="primary" type="submit">

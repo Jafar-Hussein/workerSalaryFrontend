@@ -13,12 +13,16 @@ function Salary() {
     const [totalPages, setTotalPages] = useState(0);
 
     const itemsPerPage = 10; // Define how many items you want per page
-
+    const handleButtonClick = (buttonId) => {
+        if (buttonId === 'back') {
+            navigate('/admin-dashboard');
+        }
+    }
     useEffect(() => {
         // Function to fetch employee data
         const fetchEmployees = async () => {
             try {
-                const response = await fetch('http://localhost:5000/employee/admin-all', {
+                const response = await fetch(getEmployeeUrl, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -141,6 +145,7 @@ function Salary() {
                                 onChange={handleInputChange} 
                             />
                         </Form.Group>
+                        <Button variant='primary' id='back' onClick={() => handleButtonClick('back')}>back</Button>
                         <Button variant="primary" type="submit">
                             Set Salary
                         </Button>
