@@ -12,8 +12,10 @@ import Salary from '../img/salary.jpg';
 import Update from '../img/update.jpg';
 import Leave from '../img/leave.jpg';
 import CheckOut from '../img/checkout.jpg';
+import { useNavigate } from 'react-router-dom';
 
 function UserDash() {
+  const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
   const [message, setMessage] = React.useState('');
 
@@ -101,10 +103,10 @@ function UserDash() {
         </Col>
         <Col className='col'>
           <div className='adjust-log'>
-            <h2 className='title'> Adjust cehck in/out</h2>
+            <h2 className='title'> Adjust check in/out</h2>
             <img src={Adjust} alt="user icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Adjust</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => navigate('/user/adjust-in-out')}>Adjust</Button>
             </>
           </div>
         </Col>
@@ -113,7 +115,7 @@ function UserDash() {
             <h2 className='title'>Get coworkers</h2>
             <img src={GetAll} alt="user icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Get</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => navigate('/user/employees')}>Get</Button>
             </>
           </div>
         </Col>
@@ -122,7 +124,7 @@ function UserDash() {
             <h2 className='title'>View salary</h2>
             <img src={Salary} alt="user icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>View</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => navigate('/user/view-salary')}>View</Button>
             </>
           </div>
         </Col>
@@ -133,7 +135,7 @@ function UserDash() {
           <h2 className='title'>Update info</h2>
           <img src={Update} alt="user icon" className='icon-image' />
           <>
-            <Button variant="primary" className='btn'>Update</Button>{' '}
+          <Button variant="primary" className='btn' onClick={() => navigate('/user/update-info')}>Update</Button>
             </>
         </div>
         </Col>
@@ -142,7 +144,7 @@ function UserDash() {
             <h2 className='title'>Leave request</h2>
             <img src={Leave} alt="user icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Leave</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => navigate('/user/leave-request')}>Leave</Button>
             </>
           </div>
         </Col>
@@ -151,7 +153,7 @@ function UserDash() {
             <h2 className='title'>Adjust leave</h2> 
             <img src={Adjust} alt="user icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn'>Adjust</Button>{' '}
+            <Button variant="primary" className='btn' onClick={() => navigate('/user/adjust-leave')}>Adjust</Button>
             </>
           </div>
         </Col>
