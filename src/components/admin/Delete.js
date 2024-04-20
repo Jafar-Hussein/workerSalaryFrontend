@@ -3,11 +3,17 @@ import { Alert, Button, Form, Row, Col, Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Delete.css';
+import axios from 'axios';
 
+const api = axios.create({
+    baseURL: 'http://localhost:5000',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Assumed you're storing the token in local storage
+    }
+});
 function Delete(){
-   // The endpoint URLs
-   const getEmployeeUrl = 'http://localhost:5000/employee/admin-all';
-   const deleteEmployeeUrl = 'http://localhost:5000/employee/delete/';
+
    const navigate = useNavigate();
 
   // State hooks
@@ -24,31 +30,19 @@ function Delete(){
         }
     }
     useEffect(() => {
-        // Function to fetch employee data
+        // Function to fetch employee data using Axios
         const fetchEmployees = async () => {
             try {
-                const response = await fetch(getEmployeeUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}` // Token must be set correctly
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setEmployees(data); // Assuming the response is an array of employees
-                setTotalPages(Math.ceil(data.length / itemsPerPage)); // Set the total number of pages
+                const response = await api.get('/employee/admin-all');
+                setEmployees(response.data); // Assuming the response data is the employees array
+                setTotalPages(Math.ceil(response.data.length / itemsPerPage)); // Calculate total pages
             } catch (error) {
-                console.error('Error fetching employees:', error);
+                setError('Error fetching employees: ' + error.message);
             }
         };
 
         fetchEmployees();
-    }, [currentPage]); // Fetch data when currentPage changes
+    }, [currentPage, api]); // Fetch data when currentPage changes
 
     // Calculate the current items to display
     const currentItems = employees.slice(
@@ -75,22 +69,13 @@ function Delete(){
             return;
         }
         try {
-            const response = await fetch(`${deleteEmployeeUrl}${deleteId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            await api.delete(`/employee/delete/${deleteId}`);
             setEmployees(employees.filter((employee) => employee.id.toString() !== deleteId));
             setError('');
             setDeleteId('');
             alert('Employee deleted successfully.');
         } catch (error) {
-            setError('Failed to delete employee.');
-            console.error('Error deleting employee:', error);
+            setError('Failed to delete employee: ' + error.message);
         }
     };
 

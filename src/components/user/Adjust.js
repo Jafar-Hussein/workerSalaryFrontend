@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form, Row, Col, Pagination, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 function Adjust() {
   const getFormattedDateTimeForSweden = (dateTime) => {
@@ -50,46 +51,33 @@ function Adjust() {
         fetchCheckIns();
         fetchCheckOuts();
     }, []);
-    const fetchCheckOuts = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/check-out/emp-check-outs', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            setCheckOuts(data);
-        } catch (error) {
-            console.error('Error fetching check-outs:', error);
-            setError('Failed to fetch check-outs.');
-        }
-    };
+    const api = axios.create({
+        baseURL: 'http://localhost:5000',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
     
-
+      const fetchCheckOuts = async () => {
+        try {
+          const response = await api.get('/check-out/emp-check-outs');
+          setCheckOuts(response.data);
+        } catch (error) {
+          console.error('Error fetching check-outs:', error);
+          setError('Failed to fetch check-outs.');
+        }
+      };
+    
       const fetchCheckIns = async () => {
         try {
-          const response = await fetch('http://localhost:5000/check-in/emp-check-ins', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          setCheckIns(data);  // Make sure this is setting data correctly
-          console.log(data);  // Add a console.log here to see what data is being set
+          const response = await api.get('/check-in/emp-check-ins');
+          setCheckIns(response.data);
         } catch (error) {
           console.error('Error fetching check-ins:', error);
           setError('Failed to fetch check-ins.');
         }
-    };
-    
+      };
+      
     const handleCheckInAdjustment = async (e) => {
       e.preventDefault();
       const checkInTime24 = convertAmPmTo24Hour(checkInAmPmTime);
@@ -103,25 +91,15 @@ function Adjust() {
         }
         
         const formattedCheckInTime = getFormattedDateTimeForSweden(adjustCheckInTime);
-          const response = await fetch(`http://localhost:5000/check-in/${selectedCheckIn}`, {
-              method: 'PUT',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
-              },
-              body: JSON.stringify({
-                  newCheckInDateTime: formattedCheckInTime,
-              }),
-          });
-  
-          if (!response.ok) {
-          }
-          await fetchCheckIns();
-          setError('');
-          alert('Check-in time adjusted successfully.');
+        await api.put(`/check-in/${selectedCheckIn}`, {
+          newCheckInDateTime: formattedCheckInTime,
+        });
+        await fetchCheckIns();
+        setError('');
+        alert('Check-in time adjusted successfully.');
       } catch (error) {
-          console.error('Error adjusting check-in:', error);
-          setError(error.message || 'Failed to adjust check-in.');
+        console.error('Error adjusting check-in:', error);
+        setError(error.message || 'Failed to adjust check-in.');
       }
   };
     
@@ -137,27 +115,17 @@ function Adjust() {
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/check-out/${selectedCheckOut}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-                body: JSON.stringify({
-                  newCheckOutDateTime: formattedCheckOutTime, // Use the formattedCheckOutTime variable here
-              }),
-            });
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          // Fetch check-outs again to update the list after the adjustment
-          fetchCheckOuts();
-          setError('');
-          alert('Check-out time adjusted successfully.');
-        } catch (error) {
-          console.error('Error adjusting check-out:', error);
-          setError('Failed to adjust check-out.');
-        }
+            const formattedCheckOutTime = getFormattedDateTimeForSweden(adjustCheckOutTime);
+      await api.put(`/check-out/${selectedCheckOut}`, {
+        newCheckOutDateTime: formattedCheckOutTime,
+      });
+      await fetchCheckOuts();
+      setError('');
+      alert('Check-out time adjusted successfully.');
+    } catch (error) {
+      console.error('Error adjusting check-out:', error);
+      setError(error.message || 'Failed to adjust check-out.');
+    }
       };
       return (
         <div className='container my-5'>

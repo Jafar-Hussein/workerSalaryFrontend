@@ -2,55 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { Pagination, Alert, Container, Card, Row, Col, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 function ViewSalary(){
-    const currentMontUrl = 'http://localhost:5000/salary/user-salary';
-    const pastSalaryUrl = 'http://localhost:5000/salary/user-Salaries';
-    const navigate = useNavigate();
-    const [currentSalary, setCurrentSalary] = useState([]);
-    const [pastSalaries, setPastSalaries] = useState([]);
-    const [error, setError] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-  const [salariesPerPage] = useState(5); 
-    useEffect(() => {
-        fetchCurrentSalary();
-        fetchPastSalaries();
-    }, []);
+  const api = axios.create({
+      baseURL: "http://localhost:5000",
+      headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+  });
 
-    const fetchCurrentSalary = async () => {
-    try{
-        const response = await fetch(currentMontUrl, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    
-        const data = await response.json();
-        setCurrentSalary(data);
-    
-    } catch (error) {
-    setError('Failed to fetch current salary.');
-    console.error('Error:', error);
-} 
-};
+  const navigate = useNavigate();
+  const [currentSalary, setCurrentSalary] = useState(null);
+  const [pastSalaries, setPastSalaries] = useState([]);
+  const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [salariesPerPage] = useState(5);
 
-const fetchPastSalaries = async () => {
-    try {
-        const response = await fetch(pastSalaryUrl, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setPastSalaries(data);
-    }
-    catch (error) {
-        setError('Failed to fetch past salaries.');
-        console.error('Error:', error);
-    }
-}
+  useEffect(() => {
+      fetchCurrentSalary();
+      fetchPastSalaries();
+  }, []);
+
+  const fetchCurrentSalary = async () => {
+      try {
+          const response = await api.get('/salary/user-salary');
+          setCurrentSalary(response.data);
+      } catch (error) {
+          setError('Failed to fetch current salary.');
+          console.error('Error:', error);
+      } 
+  };
+
+  const fetchPastSalaries = async () => {
+      try {
+          const response = await api.get('/salary/user-Salaries');
+          setPastSalaries(response.data);
+      } catch (error) {
+          setError('Failed to fetch past salaries.');
+          console.error('Error:', error);
+      }
+  };
  // Calculate the total pages for pagination
  // Pagination logic remains the same...
   const indexOfLastSalary = currentPage * salariesPerPage;

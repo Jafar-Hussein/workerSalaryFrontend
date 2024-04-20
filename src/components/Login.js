@@ -2,54 +2,44 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import '../css/login.css';
+import axios from 'axios';
 
 function Login() {
-    const url = 'http://localhost:5000/auth/login';
-    const [credentials, setCredentials] = useState({
-      username: '',
-      password: ''
-    });
-    const navigate = useNavigate();
-  
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setCredentials({ ...credentials, [name]: value });
-    };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(credentials)
-        });
-    
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-    
-        const json = await response.json();
-        const jwtToken = json.message; // Get the JWT token from the 'message' key
-    
-        if (typeof jwtToken !== 'string') {
-          throw new Error('JWT Token is not a string.');
-        }
-    
-        localStorage.setItem('token', jwtToken); // Save the JWT token in localStorage
-    
-        const decoded = jwtDecode(jwtToken); // Decode the JWT to get user's role
-    
-        // Assuming the roles are an array, check if the role includes 'ADMIN' or 'USER'
-        if (decoded.roles.includes('ADMIN')) {
-          navigate('/admin-dashboard'); // Correct usage of navigate
-        } else if (decoded.roles.includes('USER')) {
-          navigate('/user-dashboard'); // Correct usage of navigate
-        }
-      } catch (error) {
-        console.error('Login error', error);
-      }
-    };
+  const api = axios.create({
+    baseURL: 'http://localhost:5000',
+    headers: { 'Content-Type': 'application/json' }
+});
+
+const [credentials, setCredentials] = useState({
+  username: '',
+  password: ''
+});
+
+const navigate = useNavigate();
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setCredentials({ ...credentials, [name]: value });
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await api.post('/auth/login', credentials);
+    const jwtToken = response.data.message; // Get the JWT token from the response
+
+    localStorage.setItem('token', jwtToken); // Save the JWT token in localStorage
+    const decoded = jwtDecode(jwtToken); // Decode the JWT to get user's role
+
+    if (decoded.roles.includes('ADMIN')) {
+      navigate('/admin-dashboard');
+    } else if (decoded.roles.includes('USER')) {
+      navigate('/user-dashboard');
+    }
+  } catch (error) {
+    console.error('Login error', error.response?.data || error.message);
+  }
+};
     return (
       <div className='login-container'>
         <div className='content-container'>

@@ -2,79 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Button, Table, Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 function Leave() {
     const navigate = useNavigate();
+    const api = axios.create({
+        baseURL: 'http://localhost:5000',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+
     const [leaveRequests, setLeaveRequests] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [error, setError] = useState('');
-    const itemsPerPage = 10; // You can set this to any number you like
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const fetchLeaveRequests = async () => {
-            const url = 'http://localhost:5000/leave-request/all'; // Ensure this URL is correct
             try {
-                const response = await fetch(url, {
-                    method: 'GET', // Explicitly state the method, even if GET is the default
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setLeaveRequests(data); // Assuming the response is an array of leave requests
-                    console.log(data); // Debugging line to check the fetched data
-                } else {
-                    // If we reach here, there was a non-200 response code
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                const response = await api.get('/leave-request/all');
+                setLeaveRequests(response.data);
             } catch (error) {
-                // Handle any errors that occurred during the fetch
                 console.error('Failed to fetch leave requests:', error);
                 setError('Failed to fetch leave requests.');
             }
         };
 
         fetchLeaveRequests();
-    }, [currentPage]); // currentPage dependency suggests pagination, ensure it's managed correctly
+    }, [currentPage]); // Ensures that the data is refetched when currentPage changes
 
     const handleStatusChange = async (leaveRequestId, newStatus) => {
-        if (!leaveRequestId) {
-            console.error('The leaveRequestId is undefined.');
-            setError('The leaveRequestId is undefined.');
-            return;
-        }
-    
-        // The URL should match your backend endpoint for updating leave request status
-        const url = `http://localhost:5000/leave-request/${leaveRequestId}/status?status=${newStatus}`;
-    
         try {
-            const response = await fetch(url, {
-                method: 'PUT', // or 'PATCH', depending on your backend setup
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-    
-            if (response.ok) {
-                // If the status update is successful, update the state to reflect the change
-                setLeaveRequests(leaveRequests.map(request => {
-                    if (request.id === leaveRequestId) {
-                        return { ...request, status: newStatus };
-                    }
-                    return request;
-                }));
-            } else {
-                const errorResponse = await response.text();
-                throw new Error(`Failed to update leave request status: ${errorResponse}`);
-            }
+            await api.put(`/leave-request/${leaveRequestId}/status`, { status: newStatus });
+            setLeaveRequests(leaveRequests.map(request => 
+                request.id === leaveRequestId ? { ...request, status: newStatus } : request
+            ));
         } catch (error) {
             console.error('Error updating leave request status:', error);
-            setError('Failed to update leave request status. ' + error);
+            setError('Failed to update leave request status.');
         }
     };
-    
+
     // Pagination logic
     const totalPages = Math.ceil(leaveRequests.length / itemsPerPage);
     const currentLeaveRequests = leaveRequests.slice(

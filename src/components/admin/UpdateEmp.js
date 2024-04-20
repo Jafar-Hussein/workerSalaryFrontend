@@ -3,6 +3,8 @@ import { Button, Form, Row, Col, Pagination, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Update.css';
+
+
 function Update() {
     const adminAllUrl = 'http://localhost:5000/employee/admin-all';
     const updateUrl = 'http://localhost:5000/employee/admin-update/';

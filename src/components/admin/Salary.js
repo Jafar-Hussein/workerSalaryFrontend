@@ -1,105 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Row, Col, Pagination } from 'react-bootstrap';
+import { Alert, Button, Form, Row, Col, Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Salary.css';
 
 function Salary() {
-    const getEmployeeUrl= 'http://localhost:5000/employee/admin-all';
-    const setEmployeeSalaryUrl = 'http://localhost:5000/salary/set-salary/';
+    const api = axios.create({
+        baseURL: 'http://localhost:5000',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+
     const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const itemsPerPage = 10;
 
-    const itemsPerPage = 10; // Define how many items you want per page
-    const handleButtonClick = (buttonId) => {
-        if (buttonId === 'back') {
-            navigate('/admin-dashboard');
-        }
-    }
     useEffect(() => {
-        // Function to fetch employee data
         const fetchEmployees = async () => {
             try {
-                const response = await fetch(getEmployeeUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}` // Token must be set correctly
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setEmployees(data); // Assuming the response is an array of employees
-                setTotalPages(Math.ceil(data.length / itemsPerPage)); // Set the total number of pages
+                const response = await api.get('/employee/admin-all');
+                setEmployees(response.data);
+                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
             } catch (error) {
                 console.error('Error fetching employees:', error);
             }
         };
-
         fetchEmployees();
-    }, [currentPage]); // Fetch data when currentPage changes
+    }, [currentPage]);
 
-    // Calculate the current items to display
-    const currentItems = employees.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const [formSalary, setFormSalary] = useState({
+        employeeId: '',
+        hourlyRate: ''
+    });
 
-    // Generate the Pagination items
-    let items = [];
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setFormSalary({ ...formSalary, [id]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const url = `/salary/set-salary/${formSalary.employeeId}`;
+        const date = new Date();
+        const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+        try {
+            await api.post(url, {
+                month: yearMonth,
+                workedHours: 0,
+                hourlyRate: parseFloat(formSalary.hourlyRate)
+            });
+            console.log('Salary details set successfully');
+            alert('Salary updated successfully!');
+            setFormSalary({ employeeId: '', hourlyRate: '' }); // Reset the form
+        } catch (error) {
+            console.error('Error setting salary details:', error);
+            alert('Failed to set salary details: ' + error.message);
+        }
+    };
+
+    let paginationItems = [];
     for (let number = 1; number <= totalPages; number++) {
-        items.push(
+        paginationItems.push(
             <Pagination.Item key={number} active={number === currentPage} onClick={() => setCurrentPage(number)}>
                 {number}
             </Pagination.Item>
         );
     }
-    const [formSalary, setFormSalary] = useState({
-        employeeId: '',
-        hourlyRate: '',
-    });
-    const handleInputChange = (e) => {
-        const { id, value } = e.target;
-        setFormSalary({ ...formSalary, [id]: value });
-    };
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const url = setEmployeeSalaryUrl + formSalary.employeeId; // Concatenate the employee ID to the URL
-        const date = new Date();
-        const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // Format as 'yyyy-MM'
-    
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`, // Token must be set correctly
-                },
-                body: JSON.stringify({
-                    month: yearMonth, // Send the formatted 'yyyy-MM' string
-                    workedHours: 0, // You might want to add a way to set this
-                    hourlyRate: parseFloat(formSalary.hourlyRate), // Convert the string hourly rate to a float
-                    // You may need additional fields depending on your SalaryDTO
-                }),
-            });
-    
-            if (!response.ok) {
-                const errorBody = await response.text(); // Get the error message from the server
-                throw new Error(`HTTP error! status: ${response.status}, message: ${errorBody}`);
-            }
-    
-            console.log('Salary details set successfully');
-            // Maybe do something here, like clearing the form or showing a success message
-        } catch (error) {
-            console.error('Error setting salary details:', error);
-        }
-    };
+
     return (
         <div className='container my-5'>
             <h1>Salary</h1>
@@ -108,7 +81,7 @@ function Salary() {
                     <div className="detail-box">
                         <h2>Employee Details</h2>
                         <ul>
-                            {currentItems.map((employee, index) => (
+                            {employees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((employee, index) => (
                                 <li key={index}>
                                     id: {employee.id}, 
                                     first name: {employee.firstName}, 
@@ -117,43 +90,43 @@ function Salary() {
                                 </li>
                             ))}
                         </ul>
-                        <Pagination>{items}</Pagination>
+                        <Pagination>{paginationItems}</Pagination>
                     </div>
                 </Col>
-                {/* Form for employee ID and hourly rate */}
                 <Col md={6}>
-                <div className="input-box">
-                    <Form onSubmit={handleSubmit}>
-                        <h2>Set Salary Details</h2>
-                        <Form.Group>
-                            <Form.Label htmlFor='employeeId'>Employee Id</Form.Label>
-                            <Form.Control 
-                                id='employeeId' 
-                                type='number' 
-                                placeholder='Enter Id' 
-                                value={formSalary.employeeId} 
-                                onChange={handleInputChange} 
-                            />
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label htmlFor='HourlyRate'>Hourly Rate</Form.Label>
-                            <Form.Control 
-                                id='hourlyRate' 
-                                type='number'  // Changed type to 'number' for hourlyRate
-                                placeholder='Enter Hourly Rate' 
-                                value={formSalary.hourlyRate} 
-                                onChange={handleInputChange} 
-                            />
-                        </Form.Group>
-                        <Button variant='primary' id='back' onClick={() => handleButtonClick('back')}>back</Button>
-                        <Button variant="primary" type="submit">
-                            Set Salary
-                        </Button>
-                    </Form>
-                </div>
-            </Col>
+                    <div className="input-box">
+                        <Form onSubmit={handleSubmit}>
+                            <h2>Set Salary Details</h2>
+                            <Form.Group>
+                                <Form.Label htmlFor='employeeId'>Employee Id</Form.Label>
+                                <Form.Control 
+                                    id='employeeId' 
+                                    type='number' 
+                                    placeholder='Enter Id' 
+                                    value={formSalary.employeeId} 
+                                    onChange={handleInputChange} 
+                                />
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label htmlFor='hourlyRate'>Hourly Rate</Form.Label>
+                                <Form.Control 
+                                    id='hourlyRate' 
+                                    type='number' 
+                                    placeholder='Enter Hourly Rate' 
+                                    value={formSalary.hourlyRate} 
+                                    onChange={handleInputChange} 
+                                />
+                            </Form.Group>
+                            <Button variant='primary' onClick={() => navigate('/admin-dashboard')}>Back</Button>
+                            <Button variant="primary" type="submit">
+                                Set Salary
+                            </Button>
+                        </Form>
+                    </div>
+                </Col>
             </Row>
         </div>
     );
 }
+
 export default Salary;

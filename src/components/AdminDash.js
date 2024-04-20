@@ -12,34 +12,46 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/AdminDash.css';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 
 function AdminDash() {
   const navigate = useNavigate();
+  const api = axios.create({
+    baseURL: "http://localhost:5000",
+    headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  });
 
-  const handleButtonClick = (buttonId) => {
-    switch(buttonId) {
-      case 'create-account':
-        navigate('/admin/account');
-        break;
-      case 'add-info':
-        navigate('/admin/add-employee');
-        break;
-      case 'create-salary':
-        navigate('/admin/salary');
-        break;
-      case 'update-employee':
-        navigate('/admin/update-employee');
-        break;
-      case 'review-leave':
-        navigate('/admin/review-leave');
-        break;
-      case 'delete-employee':
-        navigate('/admin/delete-employee');
-        break;
-      default:
-        console.error('Invalid button ID');
-        break;
+  const handleButtonClick = async (buttonId) => {
+    try {
+      switch(buttonId) {
+        case 'create-account':
+          navigate('/admin/account');
+          break;
+        case 'add-info':
+          navigate('/admin/add-employee');
+          break;
+        case 'create-salary':
+          navigate('/admin/salary');
+          break;
+        case 'update-employee':
+          navigate('/admin/update-employee');
+          break;
+        case 'review-leave':
+          navigate('/admin/review-leave');
+          break;
+        case 'delete-employee':
+         navigate('/admin/delete-employee');
+          break;
+        default:
+          console.error('Invalid button ID');
+          break;
+      }
+    } catch (error) {
+      console.error('Error handling button click:', error);
+      alert('Operation failed, please check logs.');
     }
   };
   return (

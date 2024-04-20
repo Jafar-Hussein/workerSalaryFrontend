@@ -4,10 +4,17 @@ import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Account.css';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+
 function Account() {
     const navigate = useNavigate();
-    const url = 'http://localhost:5000/auth/register';
+    const api = axios.create({
+        baseURL: 'http://localhost:5000',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
     const [credentials, setCredentials] = useState({
         username: '',
         password: ''
@@ -27,31 +34,11 @@ function Account() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(credentials)
-            });
-    
-            if (!response.ok) {
-                const errorText = await response.text(); // Handle non-JSON responses
-                throw new Error(`HTTP error! status: ${response.status}, Message: ${errorText}`);
-            }
-            
-            const contentType = response.headers.get('Content-Type');
-            if (contentType && contentType.includes('application/json')) {
-                const json = await response.json();
-                console.log('Registration successful:', json);
-                navigate('/admin-dashboard');
-            } else {
-                const textData = await response.text();
-                console.log('Registration response:', textData);
-            }
+            const response = await api.post('/auth/register', credentials);
+            console.log('Registration successful:', response.data);
+            navigate('/admin-dashboard');
         } catch (error) {
-            console.error('Error during registration:', error);
+            console.error('Error during registration:', error.response?.data || error.message);
         }
     };
 

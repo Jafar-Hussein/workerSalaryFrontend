@@ -3,32 +3,29 @@ import { Button, Form, Row, Col, Pagination, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Employee.css';
+import axios from 'axios';
 
 function Employees() {
     const navigate = useNavigate();
-    const url = 'http://localhost:5000/employee/all';
+    const api = axios.create({
+        baseURL: "http://localhost:5000",
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
     const [employees, setEmployees] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [employeesPerPage] = useState(6); // Number of employees per page
   
     useEffect(() => {
-      // Fetch employees data from the backend
       fetchEmployees();
     }, []);
   
     const fetchEmployees = async () => {
         try {
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-    
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    
-            const data = await response.json();
-            setEmployees(data); // Assuming the backend correctly returns an array of EmployeeDTO objects
+            const response = await api.get('/employee/all');
+            setEmployees(response.data); // Assuming the response data is an array of employees
         } catch (error) {
             setError('Failed to fetch employees.');
             console.error('Error:', error);

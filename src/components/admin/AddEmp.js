@@ -3,8 +3,16 @@ import { Button, Form, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/AddEmp.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Account() {
+    const api = axios.create({
+        baseURL: 'http://localhost:5000',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
 
     const navigate = useNavigate();
     const [employeeInfo, setEmployeeInfo] = useState({
@@ -23,42 +31,31 @@ function Account() {
             navigate('/admin-dashboard');
         }
     }
+
     const handleInputChange = (e) => {
-        const { id, value } = e.target; // use id here, ensure that id matches the state property names
+        const { id, value } = e.target;
         setEmployeeInfo({ ...employeeInfo, [id]: value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/employee/add', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` // use the correct token
-                },
-                body: JSON.stringify({
-                    username: employeeInfo.username, // ensure this is what your backend expects
-                    employeeDTO: {
-                        // other details as per your backend model
-                        firstName: employeeInfo.firstName,
-                        lastName: employeeInfo.lastName,
-                        email: employeeInfo.email,
-                        phone: employeeInfo.phone,
-                        address: employeeInfo.address,
-                        city: employeeInfo.city,
-                        jobTitle: employeeInfo.jobTitle,
-                    }
-                })
+            await api.post('/employee/add', {
+                username: employeeInfo.username,
+                employeeDTO: {
+                    firstName: employeeInfo.firstName,
+                    lastName: employeeInfo.lastName,
+                    email: employeeInfo.email,
+                    phone: employeeInfo.phone,
+                    address: employeeInfo.address,
+                    city: employeeInfo.city,
+                    jobTitle: employeeInfo.jobTitle,
+                }
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
             console.log('Employee info saved successfully');
-            navigate('/admin-dashboard'); // navigate to the dashboard on success
+            navigate('/admin-dashboard'); // Navigate to the dashboard on success
         } catch (error) {
-            console.error('Error during employee info submission:', error);
+            console.error('Error during employee info submission:', error.response?.data || error.message);
         }
     };
 
