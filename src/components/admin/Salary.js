@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Salary.css';
-import { se } from 'date-fns/locale';
-import { set } from 'date-fns';
+
 
 
 const api = axios.create({
