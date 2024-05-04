@@ -16,7 +16,7 @@ import axios from 'axios';
 function UserDash() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+
 
   const handleCheckInOut = async (type) => {
     setLoading(true);

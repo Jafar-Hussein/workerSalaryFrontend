@@ -88,8 +88,6 @@ function Update() {
               setSuccessMessage('Employee updated successfully!');
               setError(''); // Clear any previous errors
   
-              const response = await api.put(url, formEmployee);
-              
               const updatedEmployees = employees.map(emp =>
                   emp.id === formEmployee.id ? { ...emp, ...formEmployee } : emp
               );

@@ -17,7 +17,6 @@ const api = axios.create({
 
 function Salary() {
     const [successMessage, setSuccessMessage] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);

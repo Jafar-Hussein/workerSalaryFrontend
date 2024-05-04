@@ -44,9 +44,8 @@ function UpdateInfo() {
         event.preventDefault();
         try {
             const token = localStorage.getItem('token');
-        
     
-            const response = await api.put('/employee/user-update', employeeInfo, {
+            await api.put('/employee/user-update', employeeInfo, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -62,6 +61,7 @@ function UpdateInfo() {
             }
         }
     };
+    
     
     const handleChange = (event) => {
         const { name, value } = event.target;

@@ -7,14 +7,13 @@ import axios from 'axios';
 const api = axios.create({
     baseURL: 'https://newpayrollmanagment.azurewebsites.net',
     headers: { 
-        // 'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
 });
 
 function Account() {
     const [successMessage, setSuccessMessage] = useState('');
-const [error, setError] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
    
     const [credentials, setCredentials] = useState({
@@ -42,7 +41,7 @@ const [error, setError] = useState('');
         }
         
         try {
-            const response = await api.post('/auth/register', credentials);
+            await api.post('/auth/register', credentials);
             setSuccessMessage('Account created successfully!');
             setError(''); // Clear any previous errors
         } catch (error) {

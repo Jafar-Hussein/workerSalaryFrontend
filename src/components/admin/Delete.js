@@ -9,59 +9,47 @@ const api = axios.create({
     baseURL: 'https://newpayrollmanagment.azurewebsites.net',
     headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}` // Assumed you're storing the token in local storage
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
 });
-function Delete(){
+
+function Delete() {
     const [successMessage, setSuccessMessage] = useState('');
-   const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  // State hooks
-  const [employees, setEmployees] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [deleteId, setDeleteId] = useState(''); // ID of the employee to be deleted
-  const [error, setError] = useState(''); // Error message state
+    // State hooks
+    const [employees, setEmployees] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [deleteId, setDeleteId] = useState('');
+    const [error, setError] = useState('');
 
-    const itemsPerPage = 10; // Define how many items you want per page
+    const itemsPerPage = 10;
+
     const handleButtonClick = (buttonId) => {
         if (buttonId === 'back') {
             navigate('/admin-dashboard');
         }
     }
+
     useEffect(() => {
-        // Function to fetch employee data using Axios
         const fetchEmployees = async () => {
             try {
                 const response = await api.get('/employee/admin-all');
-                setEmployees(response.data); // Assuming the response data is the employees array
-                setTotalPages(Math.ceil(response.data.length / itemsPerPage)); // Calculate total pages
+                setEmployees(response.data);
+                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
             } catch (error) {
                 setError('Error fetching employees: ' + error.message);
             }
         };
 
         fetchEmployees();
-    }, [currentPage, api]); // Fetch data when currentPage changes
+    }, [currentPage]); // Removed 'api' from the dependency array
 
-    // Calculate the current items to display
-    const currentItems = employees.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    // Generate the Pagination items
-    let items = [];
-    for (let number = 1; number <= totalPages; number++) {
-        items.push(
-            <Pagination.Item key={number} active={number === currentPage} onClick={() => setCurrentPage(number)}>
-                {number}
-            </Pagination.Item>
-        );
-    }
     const handleInputChange = (e) => {
         setDeleteId(e.target.value);
     };
+
     const handleDelete = async (e) => {
         e.preventDefault();
         if (!deleteId) {
@@ -98,7 +86,7 @@ function Delete(){
                                 </li>
                             ))}
                         </ul>
-                        <Pagination>{items}</Pagination>
+                        <Pagination>{/* Pagination logic */}</Pagination>
                     </div>
                 </Col>
                 <Col md={6}>

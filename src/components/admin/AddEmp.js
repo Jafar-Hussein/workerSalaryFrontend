@@ -9,18 +9,14 @@ import axios from 'axios';
 const api = axios.create({
     baseURL: 'https://newpayrollmanagment.azurewebsites.net',
     headers: {
-        // 'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
 });
 
 function Account() {
-   
-    //state variabler
     const [successMessage, setSuccessMessage] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    //state variabel för att hålla reda på användarens inmatning
     const [employeeInfo, setEmployeeInfo] = useState({
         username: '',
         firstName: '',
@@ -31,24 +27,22 @@ function Account() {
         city: '',
         jobTitle: ''
     });
- //funktion som körs när användaren klickar på en knapp
+
     const handleButtonClick = (buttonId) => {
         if (buttonId === 'back') {
             navigate('/admin-dashboard');
         }
     }
-    //funktion som körs när användaren skriver i ett inputfält
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setEmployeeInfo({ ...employeeInfo, [id]: value });
     };
-    //funktion som körs när användaren skickar in formuläret
+
     const handleSubmit = async (e) => {
-        //förhindrar att sidan laddas om när användaren skickar in formuläret
         e.preventDefault();
         try {
-            //skickar en post request till vår backend med användarens inmatning
-            const response = await api.post('/employee/add', {
+            await api.post('/employee/add', {
                 username: employeeInfo.username,
                 employeeDTO: {
                     firstName: employeeInfo.firstName,
@@ -60,7 +54,6 @@ function Account() {
                     jobTitle: employeeInfo.jobTitle,
                 }
             });
-            //om det gick bra att skicka in formuläret med eb success message till användaren
             setSuccessMessage('Employee info submitted successfully!');
             setError('');
             setEmployeeInfo({
@@ -74,10 +67,10 @@ function Account() {
                 jobTitle: ''
             }); 
         } catch (error) {
-            //om det inte gick bra att skicka in formuläret med ett error message till användaren
             setError(`Failed to submit employee info. ${error.response ? error.response.data.message : error.message}`);
         }
     };
+
 
     return (
         // jsx för att skapa ett formulär där användaren kan skriva in information om en anställd

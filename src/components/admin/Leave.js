@@ -31,7 +31,7 @@ function Leave() {
         };
 
         fetchLeaveRequests();
-    }, [currentPage]); 
+    }, [currentPage, api]); // Include 'api' in the dependency array
 
     const handleStatusChange = async (leaveRequestId, newStatus) => {
         try {
@@ -61,6 +61,7 @@ function Leave() {
             </Pagination.Item>
         );
     }
+
 
     return (
         <div className='container my-5'>
