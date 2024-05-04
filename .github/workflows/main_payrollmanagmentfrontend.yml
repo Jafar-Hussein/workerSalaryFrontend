@@ -20,14 +20,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
+          # Enable caching of npm dependencies to speed up the build process
+          cache: 'npm'
 
       - name: npm install, build, and test
         run: |
           npm install
+          # Run build and test scripts explicitly considering ESLint rules
           npm run build --if-present
           npm run test --if-present
+          # Explicit ESLint check; fail the build if there are lint errors
+          npx eslint . --max-warnings=0
 
       - name: Zip artifact for deployment
+        # Compress the build directory for deployment
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
@@ -68,4 +74,4 @@ jobs:
           app-name: 'PayrollmanagmentFrontend'
           slot-name: 'Production'
           package: .
-          
+
