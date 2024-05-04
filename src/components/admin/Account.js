@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import { Alert, Container, Card, Row, Col, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Account.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+const api = axios.create({
+    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    headers: { 
+        // 'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+});
 
 function Account() {
+    const [successMessage, setSuccessMessage] = useState('');
+const [error, setError] = useState('');
     const navigate = useNavigate();
-    const api = axios.create({
-        baseURL: 'http://localhost:5000',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-    });
+   
     const [credentials, setCredentials] = useState({
         username: '',
         password: ''
@@ -33,20 +35,29 @@ function Account() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Check if either username or password is empty
+        if (!credentials.username.trim() || !credentials.password.trim()) {
+            setError('Please fill in all fields.');
+            return; // Exit the function to prevent submitting
+        }
+        
         try {
             const response = await api.post('/auth/register', credentials);
-            console.log('Registration successful:', response.data);
-            navigate('/admin-dashboard');
+            setSuccessMessage('Account created successfully!');
+            setError(''); // Clear any previous errors
         } catch (error) {
-            console.error('Error during registration:', error.response?.data || error.message);
+            setError('Failed to create account. Please try again.');
         }
     };
+    
 
     return (
         <Form className='form' onSubmit={handleSubmit}>
             <header className='header-title'>
                 <h1>Create Account</h1>
             </header>
+            {successMessage && <Alert variant="success">{successMessage}</Alert>}
+            {error && <Alert variant="danger">{error}</Alert>}
             <Form.Group className="mb-3" controlId="formBasicUsername">
                 <Form.Label>Username</Form.Label>
                 <Form.Control 

@@ -3,7 +3,13 @@ import { Button, Form, Row, Col, Pagination, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-
+import { set } from 'date-fns';
+const api = axios.create({
+  baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+  },
+});
 function Adjust() {
   const getFormattedDateTimeForSweden = (dateTime) => {
     if (!dateTime || isNaN(new Date(dateTime).getTime())) {
@@ -33,9 +39,13 @@ function Adjust() {
     const [adjustCheckInTime, setAdjustCheckInTime] = useState('');
     const [adjustCheckOutTime, setAdjustCheckOutTime] = useState('');
     const [error, setError] = useState('');
+    const [currentCheckInPage, setCurrentCheckInPage] = useState(1);
+    const [checkInsPerPage] = useState(5); // Set this to however many you want per page
 
     const [checkInAmPmTime, setCheckInAmPmTime] = useState({ hour: '', minute: '', period: 'AM' });
     const [checkOutAmPmTime, setCheckOutAmPmTime] = useState({ hour: '', minute: '', period: 'AM' });
+
+    const [successMessage, setSuccessMessage] = useState('');
 
     const convertAmPmTo24Hour = (amPmTime) => {
       let hour = parseInt(amPmTime.hour, 10);
@@ -51,17 +61,13 @@ function Adjust() {
         fetchCheckIns();
         fetchCheckOuts();
     }, []);
-    const api = axios.create({
-        baseURL: 'http://localhost:5000',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+   
     
       const fetchCheckOuts = async () => {
         try {
           const response = await api.get('/check-out/emp-check-outs');
           setCheckOuts(response.data);
+    
         } catch (error) {
           console.error('Error fetching check-outs:', error);
           setError('Failed to fetch check-outs.');
@@ -96,7 +102,7 @@ function Adjust() {
         });
         await fetchCheckIns();
         setError('');
-        alert('Check-in time adjusted successfully.');
+       setSuccessMessage('Check-in time adjusted successfully.');
       } catch (error) {
         console.error('Error adjusting check-in:', error);
         setError(error.message || 'Failed to adjust check-in.');

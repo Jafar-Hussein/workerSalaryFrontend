@@ -4,16 +4,21 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Salary.css';
+import { se } from 'date-fns/locale';
+import { set } from 'date-fns';
+
+
+const api = axios.create({
+    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+});
 
 function Salary() {
-    const api = axios.create({
-        baseURL: 'http://localhost:5000',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-    });
-
+    const [successMessage, setSuccessMessage] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -56,11 +61,11 @@ function Salary() {
                 hourlyRate: parseFloat(formSalary.hourlyRate)
             });
             console.log('Salary details set successfully');
-            alert('Salary updated successfully!');
+            setSuccessMessage('Salary details set successfully!');
             setFormSalary({ employeeId: '', hourlyRate: '' }); // Reset the form
         } catch (error) {
             console.error('Error setting salary details:', error);
-            alert('Failed to set salary details: ' + error.message);
+            setError('Failed to set salary details. Please try again.');
         }
     };
 
@@ -73,9 +78,11 @@ function Salary() {
         );
     }
 
+
     return (
         <div className='container my-5'>
             <h1>Salary</h1>
+            {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <Row className='mb-3'>
                 <Col md={6} className="mb-4">
                     <div className="detail-box">

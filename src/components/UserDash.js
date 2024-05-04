@@ -13,9 +13,33 @@ import Update from '../img/update.jpg';
 import Leave from '../img/leave.jpg';
 import CheckOut from '../img/checkout.jpg';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
+
+import axios from 'axios';
+const api = axios.create({
+  baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+  headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+  }
+});
 function UserDash() {
   const navigate = useNavigate();
+
+  const logout = () => {
+    // Clear the token from local storage
+    localStorage.removeItem('token');
+    
+    // Redirect to the login page
+    navigate('/');
+    
+    // Reload the page to ensure all data is cleared
+    window.location.reload();
+  };
+  
+  
+
   const [loading, setLoading] = React.useState(false);
   const [message, setMessage] = React.useState('');
 
@@ -23,29 +47,8 @@ function UserDash() {
   const handleCheckIn = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/check-in/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-  
-      // Check if the response is JSON before parsing it
-      if (response.headers.get('Content-Type').includes('application/json')) {
-        const data = await response.json();
-        setMessage(data.message);
-      } else {
-        // If not JSON, handle the text response directly
-        const textData = await response.text();
-        setMessage(textData);
-      }
-  
-      if (!response.ok) {
-        // If the response is not OK, throw an error to be caught by the catch block
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
+      const response = await api.post('/check-in/');
+      setMessage(response.data.message);
     } catch (error) {
       console.error('Error during check-in:', error);
       setMessage('Check-in failed');
@@ -57,37 +60,21 @@ function UserDash() {
   const handleCheckOut = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/check-out/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-  
-      if (response.headers.get('Content-Type').includes('application/json')) {
-        const data = await response.json();
-        setMessage(data.message);
-      } else {
-        const textData = await response.text();
-        setMessage(textData);
-      }
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
+      const response = await api.post('/check-out/');
+      setMessage(response.data.message);
     } catch (error) {
       console.error('Error during check-out:', error);
       setMessage('Check-out failed');
     }
     setLoading(false);
   };
+
   
   return (
    <Container fluid="md" id='con'>
      <header className='header-title'>
       <h1>Employee Dashboard</h1>
+      <Button variant="secondary" onClick={logout}>Logout</Button>
       </header>
     <Row>
       <Col className='col'>
@@ -145,7 +132,8 @@ function UserDash() {
             <h2 className='title'>Leave request</h2>
             <img src={Leave} alt="user icon" className='icon-image' />
             <>
-            <Button variant="primary" className='btn' onClick={() => navigate('/user/leave-request')}>Leave</Button>
+            <Link to="/user/leave-request" className="btn btn-primary">Leave</Link>
+
             </>
           </div>
         </Col>
@@ -154,7 +142,9 @@ function UserDash() {
             <h2 className='title'>Adjust leave</h2> 
             <img src={Adjust} alt="user icon" className='icon-image' />
             <>
+      
             <Button variant="primary" className='btn' onClick={() => navigate('/user/adjust-leave')}>Adjust</Button>
+
             </>
           </div>
         </Col>

@@ -6,7 +6,7 @@ import './css/UpdateInfo.css';
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: "http://localhost:5000", // Your API base URL
+    baseURL: "https://newpayrollmanagment.azurewebsites.net", 
     headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
 
@@ -24,8 +24,10 @@ function UpdateInfo() {
         phone: '',
         address: '',
         city: ''
-        // Remove jobTitle as per your instruction.
+    
     });
+    const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     useEffect(() => {
         // Fetch the current user's employee info when the component mounts
         api.get('/employee/current')
@@ -36,7 +38,7 @@ function UpdateInfo() {
                setError('Failed to fetch employee info. Please try again.');
            });
     }, []);
-    const [error, setError] = useState('');
+    
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -49,7 +51,7 @@ function UpdateInfo() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            alert('Employee info updated successfully!');
+            setSuccessMessage('Employee info updated successfully!');
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 // Handle 401 error
@@ -88,6 +90,7 @@ function UpdateInfo() {
                         <Card.Header>Update Your Information</Card.Header>
                         <Card.Body>
                             {error && <Alert variant="danger">{error}</Alert>}
+                            {successMessage && <Alert variant="success">{successMessage}</Alert>}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>First Name</Form.Label>

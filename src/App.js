@@ -38,6 +38,8 @@ import ViewSalary from './components/user/ViewSalary'
             <Route path="/user/adjust-in-out" element={<AdjustInAndOut />} />
             <Route path="/user/adjust-leave" element={<AdjustLeave />} />
             <Route path="/user/leave-request" element={<LeaveReq />} />
+
+
             <Route path="/user/employees" element={<Employees />} />
             <Route path="/user/update-info" element={<UpdateInfo />} />
             <Route path="/user/view-salary" element={<ViewSalary />} />

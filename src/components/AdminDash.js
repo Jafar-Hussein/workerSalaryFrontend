@@ -14,16 +14,27 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-
+const api = axios.create({
+  baseURL: "https://newpayrollmanagment.azurewebsites.net",
+  headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+  }
+});
 function AdminDash() {
   const navigate = useNavigate();
-  const api = axios.create({
-    baseURL: "http://localhost:5000",
-    headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-    }
-  });
-
+  
+  const logout = () => {
+    // Clear the token from local storage
+    localStorage.removeItem('token');
+    
+    // Redirect to the login page
+    navigate('/');
+    
+    // Reload the page to ensure all data is cleared
+    window.location.reload();
+  };
+  
+  
   const handleButtonClick = async (buttonId) => {
     try {
       switch(buttonId) {
@@ -58,6 +69,7 @@ function AdminDash() {
     <Container fluid="md" id='con'>
       <header className='header-title'>
       <h1>Admin Dashboard</h1>
+      <Button variant="secondary" onClick={logout}>Logout</Button>
       </header>
       <Row>
         <Col className='col'>

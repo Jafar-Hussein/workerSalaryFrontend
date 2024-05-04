@@ -3,14 +3,14 @@ import { Pagination, Alert, Container, Card, Row, Col, Button } from 'react-boot
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-
+const api = axios.create({
+  baseURL: "https://newpayrollmanagment.azurewebsites.net",
+  headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+  }
+});
 function ViewSalary(){
-  const api = axios.create({
-      baseURL: "http://localhost:5000",
-      headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-  });
+  
 
   const navigate = useNavigate();
   const [currentSalary, setCurrentSalary] = useState(null);

@@ -3,11 +3,19 @@ import { Button, Form, Row, Col, Pagination, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Update.css';
+import axios from 'axios';
 
-
+const api = axios.create({
+  baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+  headers: {
+       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+  }
+});
 function Update() {
-    const adminAllUrl = 'http://localhost:5000/employee/admin-all';
-    const updateUrl = 'http://localhost:5000/employee/admin-update/';
+  const [successMessage, setSuccessMessage] = useState('');
+    const adminAllUrl = '/employee/admin-all';
+    const updateUrl = '/employee/admin-update/';
     const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -21,7 +29,6 @@ function Update() {
         address: '',
         city: '',
         jobTitle: '',
-        hourlyRate: '',
     });
     const handleButtonClick = (buttonId) => {
         if (buttonId === 'back') {
@@ -32,27 +39,20 @@ function Update() {
     const itemsPerPage = 10;
 
     useEffect(() => {
-        const fetchEmployees = async () => {
-            try {
-                const response = await fetch(adminAllUrl, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-                const data = await response.json();
-                setEmployees(data);
-                setTotalPages(Math.ceil(data.length / itemsPerPage));
-            } catch (error) {
-                setError('Failed to fetch employees.');
-                console.error('Error:', error);
-            }
-        };
-
-        fetchEmployees();
-    }, [adminAllUrl, currentPage, itemsPerPage]);
+      const fetchEmployees = async () => {
+          try {
+              const response = await api.get(adminAllUrl);
+              const data = response.data;
+              setEmployees(data);
+              setTotalPages(Math.ceil(data.length / itemsPerPage));
+          } catch (error) {
+              setError('Failed to fetch employees.');
+              console.error('Error:', error);
+          }
+      };
+  
+      fetchEmployees();
+  }, [currentPage, itemsPerPage]);
 
     const currentItems = employees.slice(
         (currentPage - 1) * itemsPerPage,
@@ -74,32 +74,40 @@ function Update() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        const url = `${updateUrl}${formEmployee.id}`;
-
-        try {
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(formEmployee)
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            navigate('/admin-dashboard');
-        } catch (error) {
-            setError('Failed to update employee.');
-            console.error('Error:', error);
-        }
-    };
-
+      e.preventDefault();
+      const url = `${updateUrl}${formEmployee.id}`;
+  
+      if (!formEmployee.id) {
+          setError('Please enter a valid Employee ID.');
+          return;
+      }
+  
+      try {
+          const response = await api.put(url, formEmployee);
+          if (response.status === 200) {
+              setSuccessMessage('Employee updated successfully!');
+              setError(''); // Clear any previous errors
+  
+              const response = await api.put(url, formEmployee);
+              
+              const updatedEmployees = employees.map(emp =>
+                  emp.id === formEmployee.id ? { ...emp, ...formEmployee } : emp
+              );
+              setEmployees(updatedEmployees);
+          } else {
+              throw new Error('Failed to update employee.');
+          }
+      } catch (error) {
+          setError('Failed to update employee. ' + error.response?.data?.message || error.message);
+          console.error('Error:', error);
+      }
+  };
+  
     return (
         <div className='container my-5'>
             <h1>Update Employee Information</h1>
             {error && <Alert variant="danger">{error}</Alert>}
+            {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <Row className='mb-3'>
                 <Col md={6} className="mb-4">
                     <div className="detail-box">
@@ -167,7 +175,12 @@ function Update() {
         <Form.Control type="text" name="city" onChange={handleInputChange} placeholder='City' required />
       </Form.Group>
     </Col>
-    {/* If you have additional fields, continue laying them out in Row and Col structures here. */}
+    <Col md={6}>
+      <Form.Group>
+        <Form.Label>Job Title</Form.Label>
+        <Form.Control type="text" name="jobTitle" onChange={handleInputChange} placeholder='Job Title' required />
+      </Form.Group>
+    </Col>
   </Row>
   <Button variant="primary" className="mt-3" type="submit">Update</Button>
 </Form>

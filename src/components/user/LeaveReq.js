@@ -6,14 +6,22 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const api = axios.create({
+    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+});
+
 function LeaveReq() {
     const navigate = useNavigate();
     const [leaveRequest, setLeaveRequest] = useState({
         startDate: new Date(),
         endDate: new Date(),
-        status: 'PENDING', // Assuming the status is set by default to 'PENDING'
+        status: 'PENDING',
     });
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState(''); // state to hold success message
 
     const formatDate = (date) => {
         return date.toISOString().split('T')[0];
@@ -28,15 +36,15 @@ function LeaveReq() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setError(''); // Clear any previous errors
+        setSuccessMessage(''); // Clear any previous messages
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5000/leave-request/create', leaveRequest, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            alert('Leave request created successfully!');
+            await api.post('/leave-request/create', leaveRequest);
+            setSuccessMessage('Leave request created successfully!'); // Set success message
+            // navigate('/user-dashboard'); // Optionally navigate to dashboard after a delay
+            // setTimeout(() => navigate('/user-dashboard'), 2000); // Navigate after 2 seconds
         } catch (error) {
+            console.error('Error during leave request creation:', error.response?.data || error.message);
             setError('Failed to create leave request. Please try again.');
         }
     };
@@ -45,6 +53,7 @@ function LeaveReq() {
         <div className='container my-5'>
             <h1>Leave Request</h1>
             {error && <Alert variant="danger">{error}</Alert>}
+            {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <Form onSubmit={handleSubmit}>
                 <Form.Group as={Row} className="mb-3">
                     <Form.Label column sm={2}>Start Date</Form.Label>

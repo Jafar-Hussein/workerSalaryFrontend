@@ -4,15 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Employee.css';
 import axios from 'axios';
-
+const api = axios.create({
+    baseURL: "https://newpayrollmanagment.azurewebsites.net",
+    headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+});
 function Employees() {
     const navigate = useNavigate();
-    const api = axios.create({
-        baseURL: "http://localhost:5000",
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-    });
+
     const [employees, setEmployees] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);

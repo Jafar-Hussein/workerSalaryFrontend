@@ -45,10 +45,10 @@ body{
 }
 .content-container {
     width: 100%;
-    height: 100%;
+    height: 100% auto;
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
+   
 }
 .user-info{
     display: flex;
@@ -87,14 +87,12 @@ body{
     width: 110px;
     height: 50px;
     border-radius: 20px;
-    border-color: #4FA2EF;
-    font-size: 20px;
+  
     font-weight: 700;
     margin-top: 20px;
 }
 
-.submit-btn:hover{
-    background-color: #2d92f0;
-    border-color: #2d92f0;
-    cursor: pointer;
-}
+.custom-alert {
+    font-size: 14px;
+  }
+  

@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
-import { Button, Form, Row, Col } from 'react-bootstrap';
+import { Button, Form, Row, Col, Alert } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/AddEmp.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Account() {
-    const api = axios.create({
-        baseURL: 'http://localhost:5000',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-    });
+// skapar en axios instans som pratar med vår backend
+const api = axios.create({
+    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    headers: {
+        // 'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+});
 
+function Account() {
+   
+    //state variabler
+    const [successMessage, setSuccessMessage] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
+    //state variabel för att hålla reda på användarens inmatning
     const [employeeInfo, setEmployeeInfo] = useState({
         username: '',
         firstName: '',
@@ -25,22 +31,24 @@ function Account() {
         city: '',
         jobTitle: ''
     });
-
+ //funktion som körs när användaren klickar på en knapp
     const handleButtonClick = (buttonId) => {
         if (buttonId === 'back') {
             navigate('/admin-dashboard');
         }
     }
-
+    //funktion som körs när användaren skriver i ett inputfält
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setEmployeeInfo({ ...employeeInfo, [id]: value });
     };
-
+    //funktion som körs när användaren skickar in formuläret
     const handleSubmit = async (e) => {
+        //förhindrar att sidan laddas om när användaren skickar in formuläret
         e.preventDefault();
         try {
-            await api.post('/employee/add', {
+            //skickar en post request till vår backend med användarens inmatning
+            const response = await api.post('/employee/add', {
                 username: employeeInfo.username,
                 employeeDTO: {
                     firstName: employeeInfo.firstName,
@@ -52,17 +60,32 @@ function Account() {
                     jobTitle: employeeInfo.jobTitle,
                 }
             });
-            console.log('Employee info saved successfully');
-            navigate('/admin-dashboard'); // Navigate to the dashboard on success
+            //om det gick bra att skicka in formuläret med eb success message till användaren
+            setSuccessMessage('Employee info submitted successfully!');
+            setError('');
+            setEmployeeInfo({
+                username: '',
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                address: '',
+                city: '',
+                jobTitle: ''
+            }); 
         } catch (error) {
-            console.error('Error during employee info submission:', error.response?.data || error.message);
+            //om det inte gick bra att skicka in formuläret med ett error message till användaren
+            setError(`Failed to submit employee info. ${error.response ? error.response.data.message : error.message}`);
         }
     };
 
     return (
+        // jsx för att skapa ett formulär där användaren kan skriva in information om en anställd
         <div className="container my-5">
             <Form id='form-info' onSubmit={handleSubmit}>
                 <h1 className='mb-4'>Add information</h1>
+                {error && <Alert variant="danger">{error}</Alert>}
+                {successMessage && <Alert variant="success">{successMessage}</Alert>}
                 <Row className="mb-3">
                     <Col md={6}>
                         <Form.Group>

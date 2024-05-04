@@ -5,9 +5,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 
 function Leave() {
+    const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
     const api = axios.create({
-        baseURL: 'http://localhost:5000',
+        baseURL: 'https://newpayrollmanagment.azurewebsites.net',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -30,11 +31,12 @@ function Leave() {
         };
 
         fetchLeaveRequests();
-    }, [currentPage]); // Ensures that the data is refetched when currentPage changes
+    }, [currentPage]); 
 
     const handleStatusChange = async (leaveRequestId, newStatus) => {
         try {
-            await api.put(`/leave-request/${leaveRequestId}/status`, { status: newStatus });
+            await api.put(`/leave-request/${leaveRequestId}/status?status=${encodeURIComponent(newStatus)}`);
+            setSuccessMessage('Leave request status updated successfully!');    
             setLeaveRequests(leaveRequests.map(request => 
                 request.id === leaveRequestId ? { ...request, status: newStatus } : request
             ));
@@ -64,6 +66,7 @@ function Leave() {
         <div className='container my-5'>
             <h1>Leave Requests</h1>
             {error && <Alert variant="danger">{error}</Alert>}
+            {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <Table striped bordered hover>
                 <thead>
                     <tr>
@@ -78,7 +81,7 @@ function Leave() {
                 <tbody>
     {currentLeaveRequests.map((request) => (
         <tr key={request.id}>
-            <td>{request.id}</td> {/* Use request.id instead of request.leaveRequestId */}
+            <td>{request.id}</td> 
             <td>{request.employeeName}</td>
             <td>{request.startDate}</td>
             <td>{request.endDate}</td>
@@ -93,7 +96,7 @@ function Leave() {
 
             </Table>
             <Pagination>{paginationItems}</Pagination>
-            <Button variant='secondary' onClick={() => navigate('/admin-dashboard')}>Back</Button>
+            <Button variant='primary' onClick={() => navigate('/admin-dashboard')}>Back</Button>
         </div>
     );
 }

@@ -6,14 +6,14 @@ import './css/Delete.css';
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000',
+    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
     headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}` // Assumed you're storing the token in local storage
     }
 });
 function Delete(){
-
+    const [successMessage, setSuccessMessage] = useState('');
    const navigate = useNavigate();
 
   // State hooks
@@ -73,7 +73,7 @@ function Delete(){
             setEmployees(employees.filter((employee) => employee.id.toString() !== deleteId));
             setError('');
             setDeleteId('');
-            alert('Employee deleted successfully.');
+            setSuccessMessage('Employee deleted successfully!');
         } catch (error) {
             setError('Failed to delete employee: ' + error.message);
         }
@@ -83,6 +83,7 @@ function Delete(){
         <div className='container my-5'>
             <h1>Delete Employee</h1>
             {error && <Alert variant="danger">{error}</Alert>}
+            {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <Row className='mb-3'>
                 <Col md={6} className="mb-4">
                     <div className="detail-box">

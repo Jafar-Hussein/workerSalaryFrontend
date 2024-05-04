@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: "http://localhost:5000",
+    baseURL: "https://newpayrollmanagment.azurewebsites.net",
     headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
@@ -23,11 +23,12 @@ function AdjustLeave() {
         endDate: new Date(),
     });
     const [error, setError] = useState('');
+    
 
     useEffect(() => {
         const fetchLeaveRequests = async () => {
             try {
-                const response = await api.get('/leave-request/employee');
+                const response = await api.get('/leave-request/employee-request');
                 console.log("Response data:", response.data); // This will show you what you're actually getting back.
                 if (Array.isArray(response.data)) {
                     console.log("Leave Requests: ", response.data); // Check if IDs are present in the data
