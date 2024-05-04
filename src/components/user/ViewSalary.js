@@ -1,67 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination, Alert, Container, Card, Row, Col, Button } from 'react-bootstrap';
+import { Alert, Container, Card, Row, Col, Button, Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+
 const api = axios.create({
   baseURL: "https://newpayrollmanagment.azurewebsites.net",
   headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
   }
 });
-function ViewSalary(){
-  
 
+function ViewSalary() {
   const navigate = useNavigate();
   const [currentSalary, setCurrentSalary] = useState(null);
   const [pastSalaries, setPastSalaries] = useState([]);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [salariesPerPage] = useState(5);
+  const salariesPerPage = 5;
 
   useEffect(() => {
-      fetchCurrentSalary();
-      fetchPastSalaries();
+    const fetchSalaries = async () => {
+      try {
+        const [currentResponse, pastResponse] = await Promise.all([
+          api.get('/salary/user-salary'),
+          api.get('/salary/user-Salaries')
+        ]);
+        setCurrentSalary(currentResponse.data);
+        setPastSalaries(pastResponse.data);
+      } catch (error) {
+        console.error('Error fetching salaries:', error);
+        setError('Failed to fetch salaries.');
+      }
+    };
+
+    fetchSalaries();
   }, []);
 
-  const fetchCurrentSalary = async () => {
-      try {
-          const response = await api.get('/salary/user-salary');
-          setCurrentSalary(response.data);
-      } catch (error) {
-          setError('Failed to fetch current salary.');
-          console.error('Error:', error);
-      } 
-  };
-
-  const fetchPastSalaries = async () => {
-      try {
-          const response = await api.get('/salary/user-Salaries');
-          setPastSalaries(response.data);
-      } catch (error) {
-          setError('Failed to fetch past salaries.');
-          console.error('Error:', error);
-      }
-  };
- // Calculate the total pages for pagination
- // Pagination logic remains the same...
   const indexOfLastSalary = currentPage * salariesPerPage;
   const indexOfFirstSalary = indexOfLastSalary - salariesPerPage;
   const currentSalaries = pastSalaries.slice(indexOfFirstSalary, indexOfLastSalary);
-
   const totalPages = Math.ceil(pastSalaries.length / salariesPerPage);
-  const paginationItems = [];
-  for (let number = 1; number <= totalPages; number++) {
-    paginationItems.push(
-      <Pagination.Item key={number} active={number === currentPage} onClick={() => setCurrentPage(number)}>
-        {number}
-      </Pagination.Item>,
-    );
-  }
 
-
- return (
+  return (
     <Container className='my-5'>
+      {error && <Alert variant="danger">{error}</Alert>}
       <Row>
         <Col md={6}>
           <Card>
@@ -84,20 +66,25 @@ function ViewSalary(){
           <Card>
             <Card.Header as="h5">Past Salaries</Card.Header>
             <Card.Body>
-              {currentSalaries.length > 0 ? (
-                currentSalaries.map((salary, index) => (
-                  <div key={index} className="mb-3">
-                    <Card.Text>Month: {salary.month}</Card.Text>
-                    <Card.Text>Worked Hours: {salary.workedHours}</Card.Text>
-                    <Card.Text>Total Salary: {salary.totalSalary}</Card.Text>
-                    <Card.Text>Hourly Rate: {salary.hourlyRate}</Card.Text>
-                  </div>
-                ))
-              ) : (
+              {currentSalaries.length > 0 ? currentSalaries.map((salary, index) => (
+                <div key={index} className="mb-3">
+                  <Card.Text>Month: {salary.month}</Card.Text>
+                  <Card.Text>Worked Hours: {salary.workedHours}</Card.Text>
+                  <Card.Text>Total Salary: {salary.totalSalary}</Card.Text>
+                  <Card.Text>Hourly Rate: {salary.hourlyRate}</Card.Text>
+                </div>
+              )) : (
                 <Alert variant="info">No past salaries data available.</Alert>
               )}
-              {/* Pagination controls within the past salary card */}
-              {totalPages > 1 && <Pagination className="justify-content-center">{paginationItems}</Pagination>}
+              {totalPages > 1 && (
+                <Pagination className="justify-content-center">
+                  {[...Array(totalPages)].map((_, index) => (
+                    <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => setCurrentPage(index + 1)}>
+                      {index + 1}
+                    </Pagination.Item>
+                  ))}
+                </Pagination>
+              )}
             </Card.Body>
           </Card>
         </Col>
@@ -106,4 +93,5 @@ function ViewSalary(){
     </Container>
   );
 }
+
 export default ViewSalary;
