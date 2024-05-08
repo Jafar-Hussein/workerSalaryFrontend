@@ -68,12 +68,14 @@ function AdjustLeave() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setError(''); // Reset error state at the beginning of the submission
+        setSuccessMessage(''); // Reset success message at the beginning of the submission
     
         if (!selectedLeaveRequest || selectedLeaveRequest.id == null) {
             setError('Please select a valid leave request to adjust.');
             return;
         }
-        setSuccessMessage('');
+    
         const formattedStartDate = dates.startDate.toISOString().split('T')[0];
         const formattedEndDate = dates.endDate.toISOString().split('T')[0];
     
@@ -83,8 +85,8 @@ function AdjustLeave() {
                 endDate: formattedEndDate
             });
     
-            if (response.status === 200) {
-                await updateLeaveRequests(); // Call the function to re-fetch the leave requests
+            if (response.status >= 200 && response.status < 300) { // Check for successful status codes
+                await updateLeaveRequests(); // Re-fetch the leave requests
                 setSelectedLeaveRequest(null); // Reset selected leave request
                 setDates({ startDate: new Date(), endDate: new Date() }); // Reset dates
                 setSuccessMessage('Leave request dates updated successfully!');
@@ -92,6 +94,7 @@ function AdjustLeave() {
                 setError(`Unexpected response status: ${response.status}`);
             }
         } catch (error) {
+            console.error('Error updating leave request:', error);
             if (error.response) {
                 setError(`Failed to update leave request dates. Server responded with status: ${error.response.status}`);
             } else {
@@ -100,9 +103,10 @@ function AdjustLeave() {
         }
     };
     
+    
     const updateLeaveRequests = async () => {
         try {
-            const response = await api.get('/leave-request/employee');
+            const response = await api.get('/leave-request/employee-request');
             if (Array.isArray(response.data)) {
                 setLeaveRequests(response.data);
             } else {
