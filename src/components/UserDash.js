@@ -28,6 +28,7 @@ function UserDash() {
         }
       });
       setMessage(response.data.message);
+      console.log(response.data.message);
     } catch (error) {
       console.error(`Error during ${type}:`, error);
       setMessage(`${type.replace('-', ' ')} failed`);

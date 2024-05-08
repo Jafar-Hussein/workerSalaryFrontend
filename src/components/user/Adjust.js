@@ -44,10 +44,18 @@ function Adjust() {
       return;
     }
 
+    const payload = {};
+    if (type === 'check-in') {
+      payload.newCheckInDateTime = adjustTime;  // Adjust key name as per backend expectation for check-ins
+    } else if (type === 'check-out') {
+      payload.newCheckOutDateTime = adjustTime; // Adjust key name as per backend expectation for check-outs
+    }
+
+    console.log(`Adjusting ${type} for ID ${selectedId} to new time ${adjustTime}`);
+    console.log(`Payload sent: `, payload);  // Logging the payload to check structure
+
     try {
-      await api.put(`/${type}/${selectedId}`, {
-        newDateTime: adjustTime,
-      });
+      await api.put(`/${type}/${selectedId}`, payload);
       setError('');
       alert(`${type} time adjusted successfully.`);
       navigate('/user-dashboard'); // Redirect after successful adjustment
@@ -56,6 +64,8 @@ function Adjust() {
       setError(`Failed to adjust ${type}.`);
     }
   };
+
+  
 
   return (
     <div className='container my-5'>
