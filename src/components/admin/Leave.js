@@ -8,7 +8,7 @@ function Leave() {
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
     const api = axios.create({
-        baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+        baseURL: 'http://localhost:5000',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -19,6 +19,7 @@ function Leave() {
     const [error, setError] = useState('');
     const itemsPerPage = 10;
 
+    // Hämta ledighetsförfrågningar när komponenten laddas eller när currentPage eller api ändras
     useEffect(() => {
         const fetchLeaveRequests = async () => {
             try {
@@ -31,8 +32,9 @@ function Leave() {
         };
 
         fetchLeaveRequests();
-    }, [currentPage, api]); // Include 'api' in the dependency array
+    }, [currentPage, api]); // Inkludera 'api' i beroendearrayen
 
+    // Hantera statusändring för en ledighetsförfrågan
     const handleStatusChange = async (leaveRequestId, newStatus) => {
         try {
             await api.put(`/leave-request/${leaveRequestId}/status?status=${encodeURIComponent(newStatus)}`);
@@ -46,7 +48,7 @@ function Leave() {
         }
     };
 
-    // Pagination logic
+    // Paginering logik
     const totalPages = Math.ceil(leaveRequests.length / itemsPerPage);
     const currentLeaveRequests = leaveRequests.slice(
         (currentPage - 1) * itemsPerPage,
@@ -61,7 +63,6 @@ function Leave() {
             </Pagination.Item>
         );
     }
-
 
     return (
         <div className='container my-5'>
@@ -80,21 +81,20 @@ function Leave() {
                     </tr>
                 </thead>
                 <tbody>
-    {currentLeaveRequests.map((request) => (
-        <tr key={request.id}>
-            <td>{request.id}</td> 
-            <td>{request.employeeName}</td>
-            <td>{request.startDate}</td>
-            <td>{request.endDate}</td>
-            <td>{request.status}</td>
-            <td>
-                <Button variant="success" onClick={() => handleStatusChange(request.id, 'ACCEPTED')}>Accept</Button>
-                <Button variant="danger" onClick={() => handleStatusChange(request.id, 'DENIED')}>Deny</Button>
-            </td>
-        </tr>
-    ))}
-</tbody>
-
+                    {currentLeaveRequests.map((request) => (
+                        <tr key={request.id}>
+                            <td>{request.id}</td> 
+                            <td>{request.employeeName}</td>
+                            <td>{request.startDate}</td>
+                            <td>{request.endDate}</td>
+                            <td>{request.status}</td>
+                            <td>
+                                <Button variant="success" onClick={() => handleStatusChange(request.id, 'ACCEPTED')}>Accept</Button>
+                                <Button variant="danger" onClick={() => handleStatusChange(request.id, 'DENIED')}>Deny</Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
             </Table>
             <Pagination>{paginationItems}</Pagination>
             <Button variant='primary' onClick={() => navigate('/admin-dashboard')}>Back</Button>

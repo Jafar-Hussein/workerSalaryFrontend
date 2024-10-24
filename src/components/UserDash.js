@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom';
 
 import axios from 'axios';
 const api = axios.create({
-  baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+  baseURL: 'http://localhost:5000',
   headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}`

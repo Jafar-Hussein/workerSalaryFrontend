@@ -6,7 +6,7 @@ import './css/Delete.css';
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    baseURL: 'http://localhost:5000',
     headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -26,12 +26,14 @@ function Delete() {
 
     const itemsPerPage = 10;
 
+    // Hantera knappklick
     const handleButtonClick = (buttonId) => {
         if (buttonId === 'back') {
             navigate('/admin-dashboard');
         }
     }
 
+    // Hämta anställda när komponenten laddas eller när currentPage ändras
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
@@ -44,12 +46,14 @@ function Delete() {
         };
 
         fetchEmployees();
-    }, [currentPage]); // Removed 'api' from the dependency array
+    }, [currentPage]); // Tog bort 'api' från beroendearrayen
 
+    // Hantera ändring i inputfältet
     const handleInputChange = (e) => {
         setDeleteId(e.target.value);
     };
 
+    // Hantera borttagning av anställd
     const handleDelete = async (e) => {
         e.preventDefault();
         if (!deleteId) {

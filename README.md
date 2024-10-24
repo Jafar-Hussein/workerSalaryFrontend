@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# WorkerSalary Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Projektbeskrivning
 
-## Available Scripts
+Denna frontend-applikation är byggd för att kommunicera med WorkerSalary backend-systemet. Applikationen låter användare hantera tidrapportering, löner och uppdatering av personlig information. Systemet stödjer både vanliga användare och administratörer för att visa och uppdatera data från backend-API:t.
 
-In the project directory, you can run:
+## Funktioner
 
-### `npm start`
+- **Check-In/Check-Out**: Användare kan checka in och checka ut för att logga arbetade timmar.
+- **Visa löneinformation**: Användare kan visa sin nuvarande och tidigare lön.
+- **Uppdatera information**: Användare kan uppdatera sin personliga information som förnamn, efternamn, e-post, telefonnummer, adress och stad.
+- **Administratörshantering**: Administratörer kan uppdatera information om anställda och hantera andra administrativa funktioner.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Teknisk Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Frontend**: React
+- **CSS Framework**: Bootstrap
+- **API-förfrågningar**: Axios för kommunikation med backend
+- **Routing**: React Router för att navigera mellan olika sidor
 
-### `npm test`
+## Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Förutsättningar
 
-### `npm run build`
+- Node.js (version 14+)
+- Backend-projektet [WorkerSalary Backend](https://github.com/Jafar-Hussein/workerSalary) körs på `http://localhost:5000`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Steg för att köra applikationen
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Klona detta repository:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   ```bash
+   git clone https://github.com/ditt-anvandar-namn/WorkerSalary-Frontend.git
+   ```
+2. Installera nödvändiga beroenden:
 
-### `npm run eject`
+   ```
+   npm install
+   ```
+3.
+ ```
+    npm start
+ ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Logga in som administratör
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+För att kunna skapa inloggningar för medarbetare måste du först logga in som administratör:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Användarnamn**: `admin`
+- **Lösenord**: `admin`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Skapa medarbetare-inloggning
 
-## Learn More
+Efter att du har loggat in som administratör, följ dessa steg för att skapa en inloggning för en medarbetare:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Gå till "Lägg till medarbetare"-sidan.
+2. Ange användarnamn och lösenord för den nya medarbetaren.
+3. Fyll i den nödvändiga informationen som förnamn, efternamn, e-postadress och andra detaljer.
+4. Klicka på "Skapa" för att registrera medarbetaren.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+När medarbetaren är registrerad kan de logga in med sina uppgifter och börja använda systemet för att checka in, checka ut och visa sin löneinformation.

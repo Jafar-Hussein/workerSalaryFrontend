@@ -6,9 +6,10 @@ import { Alert, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+  baseURL: 'http://localhost:5000',
   headers: { 'Content-Type': 'application/json' }
 });
+
 function Login() {
   const [error, setError] = useState('');
 const [credentials, setCredentials] = useState({

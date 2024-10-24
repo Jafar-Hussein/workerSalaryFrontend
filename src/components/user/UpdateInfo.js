@@ -5,112 +5,113 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/UpdateInfo.css';
 import axios from 'axios';
 
+// Skapa en instans av Axios med bas-URL och authorization-header som hämtar JWT-token från localStorage
 const api = axios.create({
-    baseURL: "https://newpayrollmanagment.azurewebsites.net", 
+    baseURL: "http://localhost:5000", // API-basen URL
     headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Använd JWT-token för autentisering
     }
-
 });
 
-
 function UpdateInfo() {
-    const navigate = useNavigate();
-    const [employeeInfo, setEmployeeInfo] = useState({ // Assuming you do not need to update the ID.
+    const navigate = useNavigate(); // Hook för att navigera till olika sidor
+    // State för att lagra och uppdatera anställdas information
+    const [employeeInfo, setEmployeeInfo] = useState({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
         address: '',
         city: ''
-    
     });
-    const [error, setError] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
+
+    const [error, setError] = useState(''); // State för att hantera felmeddelanden
+    const [successMessage, setSuccessMessage] = useState(''); // State för att visa framgångsmeddelanden
+
+    // useEffect körs vid komponentens första render för att hämta nuvarande anställdas information
     useEffect(() => {
-        // Fetch the current user's employee info when the component mounts
+        // Hämta information om den inloggade användarens anställda
         api.get('/employee/current')
            .then(response => {
-               setEmployeeInfo(response.data);
+               setEmployeeInfo(response.data); // Sätt den hämtade informationen i state
            })
            .catch(error => {
-               setError('Failed to fetch employee info. Please try again.');
+               setError('Kunde inte hämta information om anställda. Försök igen.'); // Sätt felmeddelande om något går fel
            });
     }, []);
-    
 
+    // Funktion för att hantera formulärskick
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        event.preventDefault(); // Förhindra standardformulärskick
         try {
-            const token = localStorage.getItem('token');
-    
+            const token = localStorage.getItem('token'); // Hämta token från localStorage
+            
+            // Skicka PUT-förfrågan till API för att uppdatera anställdas information
             await api.put('/employee/user-update', employeeInfo, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}` // Skicka token för att autentisera förfrågan
                 }
             });
-            setSuccessMessage('Employee info updated successfully!');
+            setSuccessMessage('Anställdas information uppdaterades framgångsrikt!'); // Visa framgångsmeddelande
         } catch (error) {
             if (error.response && error.response.status === 401) {
-                // Handle 401 error
-                setError('Your session has expired. Please log in again.');
-                // Redirect to login page or show login modal
+                // Hantera 401-fel (Obehörig)
+                setError('Din session har gått ut. Logga in igen.');
             } else {
-                setError('Failed to update employee info. Please try again.');
+                setError('Kunde inte uppdatera information om anställda. Försök igen.'); // Visa felmeddelande vid fel
             }
         }
     };
-    
-    
+
+    // Funktion för att hantera ändringar i formulärfält
     const handleChange = (event) => {
-        const { name, value } = event.target;
-        setEmployeeInfo({ ...employeeInfo, [name]: value });
+        const { name, value } = event.target; // Hämta namn och värde från formulärfältet
+        setEmployeeInfo({ ...employeeInfo, [name]: value }); // Uppdatera motsvarande fält i state
     };
 
     return (
         <Container className='mt-4'>
-            <h1>Update information</h1>
+            <h1>Uppdatera information</h1>
             <Row>
                 <Col md={6}>
                     <Card>
-                        <Card.Header>Current Information</Card.Header>
+                        <Card.Header>Nuvarande Information</Card.Header>
                         <Card.Body>
-                            <p><strong>First Name:</strong> {employeeInfo.firstName}</p>
-                            <p><strong>Last Name:</strong> {employeeInfo.lastName}</p>
+                            <p><strong>Förnamn:</strong> {employeeInfo.firstName}</p>
+                            <p><strong>Efternamn:</strong> {employeeInfo.lastName}</p>
                             <p><strong>Email:</strong> {employeeInfo.email}</p>
-                            <p><strong>Phone:</strong> {employeeInfo.phone}</p>
-                            <p><strong>Address:</strong> {employeeInfo.address}</p>
-                            <p><strong>City:</strong> {employeeInfo.city}</p>
+                            <p><strong>Telefon:</strong> {employeeInfo.phone}</p>
+                            <p><strong>Adress:</strong> {employeeInfo.address}</p>
+                            <p><strong>Stad:</strong> {employeeInfo.city}</p>
                         </Card.Body>
                     </Card>
                 </Col>
                 <Col md={6}>
                     <Card>
-                        <Card.Header>Update Your Information</Card.Header>
+                        <Card.Header>Uppdatera Din Information</Card.Header>
                         <Card.Body>
-                            {error && <Alert variant="danger">{error}</Alert>}
-                            {successMessage && <Alert variant="success">{successMessage}</Alert>}
+                            {error && <Alert variant="danger">{error}</Alert>} {/* Visa felmeddelanden */}
+                            {successMessage && <Alert variant="success">{successMessage}</Alert>} {/* Visa framgångsmeddelanden */}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>First Name</Form.Label>
+                                    <Form.Label column sm={4}>Förnamn</Form.Label>
                                     <Col sm={8}>
                                         <Form.Control
                                             type="text"
                                             name="firstName"
-                                            value={employeeInfo.firstName}
-                                            onChange={handleChange}
+                                            value={employeeInfo.firstName} // Bind fältet till employeeInfo state
+                                            onChange={handleChange} // Hantera ändringar
                                         />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Last Name</Form.Label>
+                                    <Form.Label column sm={4}>Efternamn</Form.Label>
                                     <Col sm={8}>
                                         <Form.Control
                                             type="text"
                                             name="lastName"
-                                            value={employeeInfo.lastName}
-                                            onChange={handleChange}
+                                            value={employeeInfo.lastName} // Bind fältet till employeeInfo state
+                                            onChange={handleChange} // Hantera ändringar
                                         />
                                     </Col>
                                 </Form.Group>
@@ -120,54 +121,53 @@ function UpdateInfo() {
                                         <Form.Control
                                             type="email"
                                             name="email"
-                                            value={employeeInfo.email}
-                                            onChange={handleChange}
+                                            value={employeeInfo.email} // Bind fältet till employeeInfo state
+                                            onChange={handleChange} // Hantera ändringar
                                         />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Phone</Form.Label>
+                                    <Form.Label column sm={4}>Telefon</Form.Label>
                                     <Col sm={8}>
                                         <Form.Control
                                             type="text"
                                             name="phone"
-                                            value={employeeInfo.phone}
-                                            onChange={handleChange}
+                                            value={employeeInfo.phone} // Bind fältet till employeeInfo state
+                                            onChange={handleChange} // Hantera ändringar
                                         />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Address</Form.Label>
+                                    <Form.Label column sm={4}>Adress</Form.Label>
                                     <Col sm={8}>
                                         <Form.Control
                                             type="text"
                                             name="address"
-                                            value={employeeInfo.address}
-                                            onChange={handleChange}
+                                            value={employeeInfo.address} // Bind fältet till employeeInfo state
+                                            onChange={handleChange} // Hantera ändringar
                                         />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>City</Form.Label>
+                                    <Form.Label column sm={4}>Stad</Form.Label>
                                     <Col sm={8}>
                                         <Form.Control
                                             type="text"
                                             name="city"
-                                            value={employeeInfo.city}
-                                            onChange={handleChange}
+                                            value={employeeInfo.city} // Bind fältet till employeeInfo state
+                                            onChange={handleChange} // Hantera ändringar
                                         />
                                     </Col>
                                 </Form.Group>
                                 <div className="text-center">
-                                    <Button variant="primary" type="submit">Save Changes</Button>
-                                </div>
+                                    <Button variant="primary" type="submit">Spara ändringar</Button>
+                                </div> {/* Knapp för att spara ändringar */}
                             </Form>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
-            <Button variant='primary' onClick={() => navigate('/user-dashboard')}>Back</Button>
-                
+            <Button variant='primary' onClick={() => navigate('/user-dashboard')}>Tillbaka</Button> {/* Knapp för att navigera tillbaka */}
         </Container>
     );
 }

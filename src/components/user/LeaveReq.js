@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    baseURL: 'http://localhost:5000',
     headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
@@ -21,12 +21,14 @@ function LeaveReq() {
         status: 'PENDING',
     });
     const [error, setError] = useState('');
-    const [successMessage, setSuccessMessage] = useState(''); // state to hold success message
+    const [successMessage, setSuccessMessage] = useState(''); // state för att hålla framgångsmeddelande
 
+    // Formatera datum till ISO-sträng
     const formatDate = (date) => {
         return date.toISOString().split('T')[0];
     };
 
+    // Hantera ändringar i formulärfälten
     const handleChange = (name, value) => {
         if (name === 'startDate' || name === 'endDate') {
             value = formatDate(value);
@@ -34,15 +36,14 @@ function LeaveReq() {
         setLeaveRequest({ ...leaveRequest, [name]: value });
     };
 
+    // Hantera formulärinlämning
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setError(''); // Clear any previous errors
-        setSuccessMessage(''); // Clear any previous messages
+        setError(''); // Rensa tidigare fel
+        setSuccessMessage(''); // Rensa tidigare meddelanden
         try {
             await api.post('/leave-request/create', leaveRequest);
-            setSuccessMessage('Leave request created successfully!'); // Set success message
-            // navigate('/user-dashboard'); // Optionally navigate to dashboard after a delay
-            // setTimeout(() => navigate('/user-dashboard'), 2000); // Navigate after 2 seconds
+            setSuccessMessage('Leave request created successfully!'); // Sätt framgångsmeddelande
         } catch (error) {
             console.error('Error during leave request creation:', error.response?.data || error.message);
             setError('Failed to create leave request. Please try again.');
@@ -75,7 +76,7 @@ function LeaveReq() {
                         />
                     </Col>
                 </Form.Group>
-                {/* The status field can be a hidden field or managed by the application state */}
+                {/* Statusfältet kan vara ett dolt fält eller hanteras av applikationens tillstånd */}
                 <div className="text-center">
                     <Button variant='primary' onClick={() => navigate('/user-dashboard')}>Back</Button>
                     <Button variant="primary" type="submit">Submit Request</Button>

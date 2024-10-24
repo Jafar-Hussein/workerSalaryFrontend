@@ -26,7 +26,7 @@ import ViewSalary from './components/user/ViewSalary'
            <Route path="/admin-dashboard" element={<AdminDash />} />
            <Route path="/user-dashboard" element={<UserDash />} />
            
-           {/* Define routes for your other components here */}
+        
           <Route path="/admin/account" element={<Account />} />
           <Route path="/admin/add-employee" element={<AddEmp />} />
           <Route path="/admin/update-employee" element={<UpdateEmp />} />
@@ -34,7 +34,7 @@ import ViewSalary from './components/user/ViewSalary'
           <Route path="/admin/salary" element={<Salary />} />
            <Route path="/admin/review-leave" element={<Leave />} />
 
-           {/* Add routes for user components here */}
+          
             <Route path="/user/adjust-in-out" element={<AdjustInAndOut />} />
             <Route path="/user/adjust-leave" element={<AdjustLeave />} />
             <Route path="/user/leave-request" element={<LeaveReq />} />
@@ -48,19 +48,5 @@ import ViewSalary from './components/user/ViewSalary'
      </Router>
    );
  }
-// function App() {
-//   return (
-//    <div className='App'>
-//     <Account />
-//    </div>
-//   );
-// }
 
-// function App() {
-//   return (
-//     <div className='App'>
-//      <AddEmp />
-//     </div>
-//   );
-// }
 export default App;

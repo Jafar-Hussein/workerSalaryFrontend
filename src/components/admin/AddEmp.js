@@ -7,7 +7,7 @@ import axios from 'axios';
 
 // skapar en axios instans som pratar med vår backend
 const api = axios.create({
-    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    baseURL: 'http://localhost:5000',
     headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }

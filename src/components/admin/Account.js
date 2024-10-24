@@ -4,8 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Account.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 const api = axios.create({
-    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    baseURL: 'http://localhost:5000',
     headers: { 
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
@@ -21,35 +22,37 @@ function Account() {
         password: ''
     });
 
+    // Hantera knappklick
     const handleButtonClick = (buttonId) => {
         if (buttonId === 'back') {
             navigate('/admin-dashboard');
         }
     }
 
+    // Hantera ändringar i inloggningsuppgifterna
     const handleCredentials = (e) => {
         const { name, value } = e.target;
         setCredentials({ ...credentials, [name]: value });
     };
 
+    // Hantera formulärinlämning
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Check if either username or password is empty
+        // Kontrollera om användarnamn eller lösenord är tomt
         if (!credentials.username.trim() || !credentials.password.trim()) {
             setError('Please fill in all fields.');
-            return; // Exit the function to prevent submitting
+            return; // Avsluta funktionen för att förhindra inlämning
         }
         
         try {
             await api.post('/auth/register', credentials);
             setSuccessMessage('Account created successfully!');
-            setError(''); // Clear any previous errors
+            setError(''); // Rensa tidigare fel
         } catch (error) {
             setError('Failed to create account. Please try again.');
         }
     };
     
-
     return (
         <Form className='form' onSubmit={handleSubmit}>
             <header className='header-title'>
@@ -62,7 +65,7 @@ function Account() {
                 <Form.Control 
                     type="text" 
                     placeholder="Enter username" 
-                    name="username" // Make sure to set the 'name' attribute to match the state keys
+                    name="username" // Se till att 'name'-attributet matchar state-nycklarna
                     value={credentials.username}
                     onChange={handleCredentials} 
                 />
@@ -73,7 +76,7 @@ function Account() {
                 <Form.Control 
                     type="password" 
                     placeholder="Password" 
-                    name="password" // Make sure to set the 'name' attribute to match the state keys
+                    name="password" // Se till att 'name'-attributet matchar state-nycklarna
                     value={credentials.password}
                     onChange={handleCredentials}
                 />

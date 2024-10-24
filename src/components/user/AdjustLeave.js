@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: "https://newpayrollmanagment.azurewebsites.net",
+    baseURL: "http://localhost:5000",
     headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
@@ -24,14 +24,14 @@ function AdjustLeave() {
     });
     const [error, setError] = useState('');
     
-
+    // Hämta ledighetsförfrågningar när komponenten laddas
     useEffect(() => {
         const fetchLeaveRequests = async () => {
             try {
                 const response = await api.get('/leave-request/employee-request');
-                console.log("Response data:", response.data); // This will show you what you're actually getting back.
+                console.log("Response data:", response.data); // Detta visar vad du faktiskt får tillbaka.
                 if (Array.isArray(response.data)) {
-                    console.log("Leave Requests: ", response.data); // Check if IDs are present in the data
+                    console.log("Leave Requests: ", response.data); // Kontrollera om ID:n finns i datan
                     setLeaveRequests(response.data);
                 } else {
                     setError('Data format incorrect, expected an array');
@@ -45,11 +45,12 @@ function AdjustLeave() {
         fetchLeaveRequests();
     }, []);
     
-
+    // Hantera datumändring
     const handleDateChange = (name, date) => {
         setDates({ ...dates, [name]: date });
     };
 
+    // Hantera ändring av vald ledighetsförfrågan
     const handleLeaveRequestChange = (event) => {
         const id = event.target.value;
         const leaveRequest = leaveRequests.find(lr => lr.id.toString() === id);
@@ -57,7 +58,7 @@ function AdjustLeave() {
             setError('Selected leave request not found.');
             return;
         }
-        console.log("Selected leave request: ", leaveRequest); // Log the selected leave request.
+        console.log("Selected leave request: ", leaveRequest); // Logga den valda ledighetsförfrågan.
         setSelectedLeaveRequest(leaveRequest);
         setDates({
             startDate: new Date(leaveRequest.startDate),
@@ -65,11 +66,11 @@ function AdjustLeave() {
         });
     };
     
-
+    // Hantera formulärinlämning
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setError(''); // Reset error state at the beginning of the submission
-        setSuccessMessage(''); // Reset success message at the beginning of the submission
+        setError(''); // Återställ felmeddelande i början av inlämningen
+        setSuccessMessage(''); // Återställ framgångsmeddelande i början av inlämningen
     
         if (!selectedLeaveRequest || selectedLeaveRequest.id == null) {
             setError('Please select a valid leave request to adjust.');
@@ -85,10 +86,10 @@ function AdjustLeave() {
                 endDate: formattedEndDate
             });
     
-            if (response.status >= 200 && response.status < 300) { // Check for successful status codes
-                await updateLeaveRequests(); // Re-fetch the leave requests
-                setSelectedLeaveRequest(null); // Reset selected leave request
-                setDates({ startDate: new Date(), endDate: new Date() }); // Reset dates
+            if (response.status >= 200 && response.status < 300) { // Kontrollera framgångsrika statuskoder
+                await updateLeaveRequests(); // Hämta ledighetsförfrågningar igen
+                setSelectedLeaveRequest(null); // Återställ vald ledighetsförfrågan
+                setDates({ startDate: new Date(), endDate: new Date() }); // Återställ datum
                 setSuccessMessage('Leave request dates updated successfully!');
             } else {
                 setError(`Unexpected response status: ${response.status}`);
@@ -103,7 +104,7 @@ function AdjustLeave() {
         }
     };
     
-    
+    // Uppdatera ledighetsförfrågningar
     const updateLeaveRequests = async () => {
         try {
             const response = await api.get('/leave-request/employee-request');

@@ -5,10 +5,8 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Salary.css';
 
-
-
 const api = axios.create({
-    baseURL: 'https://newpayrollmanagment.azurewebsites.net',
+    baseURL: 'http://localhost:5000',
     headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -24,6 +22,7 @@ function Salary() {
     const [totalPages, setTotalPages] = useState(0);
     const itemsPerPage = 10;
 
+    // Hämta anställda när komponenten laddas eller när currentPage ändras
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
@@ -42,11 +41,13 @@ function Salary() {
         hourlyRate: ''
     });
 
+    // Hantera ändringar i inputfältet
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setFormSalary({ ...formSalary, [id]: value });
     };
 
+    // Hantera formulärinlämning
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = `/salary/set-salary/${formSalary.employeeId}`;
@@ -61,7 +62,7 @@ function Salary() {
             });
             console.log('Salary details set successfully');
             setSuccessMessage('Salary details set successfully!');
-            setFormSalary({ employeeId: '', hourlyRate: '' }); // Reset the form
+            setFormSalary({ employeeId: '', hourlyRate: '' }); // Återställ formuläret
         } catch (error) {
             console.error('Error setting salary details:', error);
             setError('Failed to set salary details. Please try again.');
@@ -76,7 +77,6 @@ function Salary() {
             </Pagination.Item>
         );
     }
-
 
     return (
         <div className='container my-5'>

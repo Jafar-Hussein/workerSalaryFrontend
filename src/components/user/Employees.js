@@ -4,40 +4,43 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Employee.css';
 import axios from 'axios';
+
 const api = axios.create({
-    baseURL: "https://newpayrollmanagment.azurewebsites.net",
+    baseURL: "http://localhost:5000",
     headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
 });
+
 function Employees() {
     const navigate = useNavigate();
 
     const [employees, setEmployees] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [employeesPerPage] = useState(6); // Number of employees per page
+    const [employeesPerPage] = useState(6); // Antal anställda per sida
   
     useEffect(() => {
       fetchEmployees();
     }, []);
   
+    // Hämta anställda från API
     const fetchEmployees = async () => {
         try {
             const response = await api.get('/employee/all');
-            setEmployees(response.data); // Assuming the response data is an array of employees
+            setEmployees(response.data); // Förutsätter att svaret är en array av anställda
         } catch (error) {
             setError('Failed to fetch employees.');
             console.error('Error:', error);
         }
     };
     
-    // Get current employees
+    // Hämta aktuella anställda
     const indexOfLastEmployee = currentPage * employeesPerPage;
     const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
     const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
   
-    // Change page
+    // Byt sida
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
   
     return (
@@ -67,4 +70,5 @@ function Employees() {
         </div>
     );
 }
-  export default Employees;
+
+export default Employees;
